@@ -10,9 +10,11 @@
             --bg: #000000;
             --card: #1c1c1e;
             --card2: #2c2c2e;
+            --card3: #3a3a3c;
             --sep: #38383a;
             --text: #ffffff;
             --text2: #8e8e93;
+            --text3: #636366;
             --blue: #0a84ff;
             --orange: #ff9f0a;
             --red: #ff453a;
@@ -26,255 +28,374 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
             background: var(--bg); color: var(--text);
-            height: 100vh; width: 100vw; overflow: hidden;
+            height: 100vh; height: 100dvh; width: 100vw; overflow: hidden;
             position: fixed; top:0; left:0; user-select: none;
+            -webkit-user-select: none;
         }
 
-        /* شاشة الرفع */
+        /* ===== شاشة الرفع ===== */
         .upload-screen {
             position: fixed; inset: 0; display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 500;
-            background: var(--bg); gap: 20px;
+            background: var(--bg); gap: 18px;
         }
         .upload-screen.hidden { display: none; }
-        .upload-icon { width:100px; height:100px; border-radius:28px; background:var(--card);
-            display:flex; align-items:center; justify-content:center; color:var(--blue); font-size:44px; }
-        .upload-title { font-size:24px; font-weight:700; }
-        .upload-sub { font-size:15px; color:var(--text2); text-align:center; line-height:1.5; }
+        .upload-icon {
+            width: 96px; height: 96px; border-radius: 26px; background: var(--card);
+            display: flex; align-items: center; justify-content: center; color: var(--blue);
+        }
+        .upload-title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+        .upload-sub { font-size: 15px; color: var(--text2); text-align: center; line-height: 1.5; }
         .upload-btn {
-            margin-top:8px; padding:14px 44px; border-radius:14px;
-            background:var(--blue); color:#fff; font-size:17px; font-weight:600;
-            border:none; font-family:inherit; cursor:pointer;
-            transition: transform 0.15s, opacity 0.15s;
+            margin-top: 8px; padding: 14px 44px; border-radius: 14px;
+            background: var(--blue); color: #fff; font-size: 17px; font-weight: 600;
+            border: none; font-family: inherit; cursor: pointer;
+            transition: transform 0.12s, opacity 0.12s;
         }
-        .upload-btn:active { transform:scale(0.96); opacity:0.8; }
-        .upload-hint { font-size:12px; color:var(--text2); opacity:0.5; }
-        .drop-zone {
-            position:fixed; inset:0; z-index:499; display:none;
-            align-items:center; justify-content:center;
-            background:rgba(10,132,255,0.15); backdrop-filter:blur(10px);
-            border:3px dashed var(--blue); border-radius:0;
-        }
-        .drop-zone.show { display:flex; }
-        .drop-zone span { font-size:22px; font-weight:600; color:var(--blue); }
+        .upload-btn:active { transform: scale(0.96); opacity: 0.8; }
+        .upload-hint { font-size: 12px; color: var(--text3); }
 
-        /* شريط علوي */
+        /* سحب وإفلات */
+        .drop-overlay {
+            position: fixed; inset: 0; z-index: 499; display: none;
+            align-items: center; justify-content: center;
+            background: rgba(10,132,255,0.12); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .drop-overlay.show { display: flex; }
+        .drop-overlay span { font-size: 20px; font-weight: 600; color: var(--blue); }
+
+        /* ===== شريط علوي ===== */
         .topbar {
-            position:fixed; top:0; left:0; right:0; height:96px;
-            padding-top:48px; display:flex; align-items:center;
-            justify-content:space-between; padding-left:16px; padding-right:16px;
-            background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
-            z-index:100; opacity:0; transition:opacity 0.3s; pointer-events:none;
+            position: fixed; top: 0; left: 0; right: 0;
+            height: env(safe-area-inset-top, 48px); min-height: 48px;
+            padding-top: env(safe-area-inset-top, 0px);
+            display: flex; align-items: center; justify-content: space-between;
+            padding-left: 16px; padding-right: 16px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
+            z-index: 100; opacity: 0; transition: opacity 0.3s; pointer-events: none;
         }
-        .topbar.show { opacity:1; pointer-events:auto; }
-        .topbar button { font-size:17px; background:none; border:none; font-family:inherit; cursor:pointer; padding:8px 4px; }
-        .btn-cancel { color:var(--text); opacity:0.8; }
-        .btn-done { color:var(--blue); font-weight:600; }
-        .top-title { font-size:17px; font-weight:600; }
+        .topbar.show { opacity: 1; pointer-events: auto; }
+        .topbar button {
+            font-size: 17px; background: none; border: none;
+            font-family: inherit; cursor: pointer; padding: 8px 4px;
+        }
+        .btn-cancel { color: var(--text); opacity: 0.85; }
+        .btn-done { color: var(--blue); font-weight: 600; }
+        .top-title { font-size: 17px; font-weight: 600; }
 
-        /* منطقة الصورة */
-        .image-area { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:1; }
-        #mainCanvas { max-width:100%; max-height:100%; display:block; }
+        /* ===== منطقة الصورة ===== */
+        .image-area {
+            position: fixed; inset: 0; display: flex;
+            align-items: center; justify-content: center; z-index: 1;
+        }
+        #mainCanvas { max-width: 100%; max-height: 100%; display: block; }
 
         /* نصيحة قبل/بعد */
         .compare-badge {
-            position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-            background:rgba(0,0,0,0.7); backdrop-filter:blur(10px);
-            padding:10px 24px; border-radius:20px; font-size:15px; font-weight:600;
-            z-index:90; opacity:0; transition:opacity 0.2s; pointer-events:none;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            background: rgba(0,0,0,0.65);
+            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+            padding: 10px 24px; border-radius: 20px;
+            font-size: 15px; font-weight: 600; z-index: 90;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
         }
-        .compare-badge.show { opacity:1; }
+        .compare-badge.show { opacity: 1; }
 
-        /* شريط التبويبات السفلي */
+        /* ===== شريط التبويبات السفلي (شكل بيضاوي زي آيفون) ===== */
         .bottom-bar {
-            position:fixed; bottom:0; left:0; right:0; z-index:100;
-            opacity:0; transition:opacity 0.3s; pointer-events:none;
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
-        .bottom-bar.show { opacity:1; pointer-events:auto; }
-        .tabs {
-            display:flex; justify-content:space-around; align-items:center;
-            padding:8px 4px 28px;
-            background:linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.75) 70%, transparent 100%);
+        .bottom-bar.show { opacity: 1; pointer-events: auto; }
+        .tabs-pill {
+            display: flex; justify-content: center; align-items: center; gap: 4px;
+            margin: 0 40px 8px;
+            padding: 6px 8px;
+            background: rgba(44,44,46,0.92);
+            -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            border-radius: 36px;
+            border: 0.5px solid rgba(255,255,255,0.08);
         }
         .tab-btn {
-            display:flex; flex-direction:column; align-items:center; gap:4px;
-            background:none; border:none; color:var(--text2); font-family:inherit;
-            font-size:10px; cursor:pointer; padding:6px 14px; border-radius:10px;
-            transition:color 0.2s;
+            display: flex; align-items: center; gap: 5px;
+            background: none; border: none; color: var(--text2);
+            font-family: inherit; font-size: 13px; font-weight: 500;
+            cursor: pointer; padding: 7px 16px; border-radius: 28px;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+            white-space: nowrap; position: relative;
         }
-        .tab-btn.active { color:var(--yellow); }
-        .tab-btn svg { width:22px; height:22px; fill:currentColor; }
-        .tab-btn.active svg { filter:drop-shadow(0 0 4px rgba(255,214,10,0.4)); }
+        .tab-btn.active {
+            color: #000; font-weight: 600;
+            background: var(--yellow);
+        }
+        .tab-btn svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
 
-        /* لوحة الأدوات */
+        /* ===== لوحة الأدوات (تطلع من تحت) ===== */
         .tool-panel {
-            position:fixed; bottom:0; left:0; right:0;
-            background:var(--card); border-top-left-radius:20px; border-top-right-radius:20px;
-            z-index:150; transform:translateY(100%);
-            transition:transform 0.38s cubic-bezier(0.32,0.72,0,1);
-            max-height:60vh; overflow:hidden; display:flex; flex-direction:column;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card);
+            border-top-left-radius: 16px; border-top-right-radius: 16px;
+            z-index: 150; transform: translateY(100%);
+            transition: transform 0.38s cubic-bezier(0.32,0.72,0,1);
+            max-height: 58vh; overflow: hidden; display: flex; flex-direction: column;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
-        .tool-panel.open { transform:translateY(0); }
-        .panel-handle { width:36px; height:5px; border-radius:3px; background:var(--sep); margin:8px auto 0; flex-shrink:0; }
-        .panel-body { flex:1; overflow-y:auto; padding:12px 0 36px; -webkit-overflow-scrolling:touch; }
-        .panel-body::-webkit-scrollbar { display:none; }
+        .tool-panel.open { transform: translateY(0); }
+        .panel-handle {
+            width: 36px; height: 5px; border-radius: 3px;
+            background: var(--sep); margin: 8px auto 0; flex-shrink: 0;
+            cursor: grab;
+        }
+        .panel-body {
+            flex: 1; overflow-y: auto; padding: 10px 0 24px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .panel-body::-webkit-scrollbar { display: none; }
 
-        /* لوحة التعديل - الأدوات الدائرية */
-        .edit-tools-row {
-            display:flex; overflow-x:auto; gap:16px; padding:10px 16px 6px;
-            scrollbar-width:none; -webkit-overflow-scrolling:touch;
+        /* ===== أدوات التعديل الدائرية (بالظبط زي الصور) ===== */
+        .edit-scroll {
+            display: flex; overflow-x: auto; gap: 14px;
+            padding: 10px 18px 8px; scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
-        .edit-tools-row::-webkit-scrollbar { display:none; }
+        .edit-scroll::-webkit-scrollbar { display: none; }
 
         .edit-circle {
-            flex:0 0 68px; display:flex; flex-direction:column; align-items:center;
-            gap:8px; background:none; border:none; cursor:pointer; outline:none; padding:0;
+            flex: 0 0 64px; display: flex; flex-direction: column;
+            align-items: center; gap: 7px; background: none;
+            border: none; cursor: pointer; outline: none; padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
-        .circle-icon {
-            width:56px; height:56px; border-radius:50%;
-            background:#151515; border:2.5px solid #252525;
-            display:flex; align-items:center; justify-content:center;
-            transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
-            position:relative;
+        .circle-bg {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: #111111;
+            border: 2px solid transparent;
+            display: flex; align-items: center; justify-content: center;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            position: relative; overflow: hidden;
         }
-        .circle-icon svg { width:26px; height:26px; fill:none; stroke:#fff; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
-        .edit-circle.active .circle-icon { border-color:var(--yellow); background:#0a0a0a; box-shadow:0 0 12px rgba(255,214,10,0.2); }
-        .edit-circle.modified .circle-icon::after {
-            content:''; position:absolute; inset:-5px;
-            border:2px solid var(--yellow); border-radius:50%;
+        /* الإضاءة الداخلية للدائرة (زي آيفون بالظبط) */
+        .circle-bg::before {
+            content: ''; position: absolute; inset: 0; border-radius: 50%;
+            opacity: 0.6;
         }
-        .edit-circle span { font-size:11px; color:var(--text2); font-weight:500; white-space:nowrap; transition:color 0.2s; }
-        .edit-circle.active span { color:#fff; font-weight:600; }
+        .circle-bg svg {
+            width: 24px; height: 24px; fill: none;
+            stroke: #fff; stroke-width: 1.5;
+            stroke-linecap: round; stroke-linejoin: round;
+            position: relative; z-index: 1;
+        }
 
-        /* ألوان خلفية الأيقونات */
-        .clr-auto { background:rgba(255,159,10,0.18); }
-        .clr-exposure { background:rgba(10,132,255,0.18); }
-        .clr-brilliance { background:rgba(100,210,255,0.18); }
-        .clr-highlights { background:rgba(255,214,10,0.18); }
-        .clr-shadows { background:rgba(191,90,242,0.18); }
-        .clr-contrast { background:rgba(255,55,95,0.18); }
-        .clr-brightness { background:rgba(255,159,10,0.18); }
-        .clr-blackpoint { background:rgba(142,142,147,0.18); }
-        .clr-saturation { background:rgba(48,209,88,0.18); }
-        .clr-vibrance { background:rgba(255,55,95,0.18); }
-        .clr-warmth { background:rgba(255,159,10,0.18); }
-        .clr-tint { background:rgba(100,210,255,0.18); }
-        .clr-sharpness { background:rgba(10,132,255,0.18); }
-        .clr-definition { background:rgba(191,90,242,0.18); }
-        .clr-noise { background:rgba(142,142,147,0.18); }
-        .clr-vignette { background:rgba(255,55,95,0.18); }
+        /* الحالة النشطة - إطار أصفر */
+        .edit-circle.active .circle-bg {
+            border-color: var(--yellow);
+            background: #0a0a0a;
+            box-shadow: 0 0 10px rgba(255,214,10,0.15);
+        }
+        /* حلقة خارجية صفراء لما في تعديل */
+        .edit-circle.modified .circle-bg {
+            border-color: var(--yellow);
+        }
+        .edit-circle.modified .circle-bg::after {
+            content: ''; position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border: 1.5px solid var(--yellow); border-radius: 50%;
+        }
 
-        /* سلايدر الآيفوني */
-        .slider-area { padding:10px 24px 0; display:none; }
-        .slider-area.show { display:block; }
-        .slider-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-        .slider-head span:first-child { font-size:15px; font-weight:600; }
-        .slider-reset { font-size:14px; color:var(--blue); background:none; border:none; font-family:inherit; cursor:pointer; }
-        .slider-track-wrap { position:relative; width:100%; height:28px; display:flex; align-items:center; }
-        .slider-track-bg { position:absolute; left:0; right:0; height:4px; border-radius:2px; background:var(--card2); overflow:hidden; }
-        .slider-track-fill { height:100%; border-radius:2px; background:var(--blue); width:50%; transition:width 0.04s; }
-        .slider-track-fill.neg { background:var(--orange); }
+        .edit-circle span {
+            font-size: 10px; color: var(--text2);
+            font-weight: 400; white-space: nowrap;
+            transition: color 0.2s;
+        }
+        .edit-circle.active span { color: var(--yellow); font-weight: 600; }
+
+        /* ألوان إضاءة كل دائرة */
+        .clr-auto .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(255,159,10,0.35), transparent 70%); }
+        .clr-exposure .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(10,132,255,0.35), transparent 70%); }
+        .clr-brilliance .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(100,210,255,0.35), transparent 70%); }
+        .clr-highlights .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(255,214,10,0.35), transparent 70%); }
+        .clr-shadows .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(191,90,242,0.35), transparent 70%); }
+        .clr-contrast .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(255,55,95,0.35), transparent 70%); }
+        .clr-brightness .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(255,159,10,0.35), transparent 70%); }
+        .clr-blackpoint .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(142,142,147,0.3), transparent 70%); }
+        .clr-saturation .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(48,209,88,0.35), transparent 70%); }
+        .clr-vibrance .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(255,55,95,0.35), transparent 70%); }
+        .clr-warmth .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(255,159,10,0.35), transparent 70%); }
+        .clr-tint .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(100,210,255,0.35), transparent 70%); }
+        .clr-sharpness .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(10,132,255,0.35), transparent 70%); }
+        .clr-definition .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(191,90,242,0.35), transparent 70%); }
+        .clr-noise .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(142,142,147,0.3), transparent 70%); }
+        .clr-vignette .circle-bg::before { background: radial-gradient(circle at 40% 35%, rgba(255,55,95,0.35), transparent 70%); }
+
+        /* ===== السلايدر (بالظبط زي آيفون) ===== */
+        .slider-area { padding: 8px 22px 0; display: none; }
+        .slider-area.show { display: block; }
+        .slider-head {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 10px;
+        }
+        .slider-head-title { font-size: 14px; font-weight: 600; }
+        .slider-reset-btn {
+            font-size: 14px; color: var(--blue); background: none;
+            border: none; font-family: inherit; cursor: pointer;
+        }
+        .slider-track-wrap {
+            position: relative; width: 100%; height: 28px;
+            display: flex; align-items: center;
+        }
+        .slider-track-bg {
+            position: absolute; left: 0; right: 0; height: 2px;
+            border-radius: 1px; background: var(--card3); overflow: visible;
+        }
+        .slider-track-fill {
+            position: absolute; top: 0; height: 100%; border-radius: 1px;
+            background: var(--yellow); width: 50%;
+            transition: width 0.04s;
+        }
+        .slider-track-fill.neg { background: var(--yellow); }
         input[type=range].ios-slider {
-            -webkit-appearance:none; appearance:none; position:relative;
-            width:100%; height:28px; background:transparent; z-index:2; cursor:pointer;
+            -webkit-appearance: none; appearance: none;
+            position: relative; width: 100%; height: 28px;
+            background: transparent; z-index: 2; cursor: pointer;
         }
         input[type=range].ios-slider::-webkit-slider-thumb {
-            -webkit-appearance:none; width:28px; height:28px; border-radius:50%;
-            background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.15);
+            -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(0,0,0,0.15);
         }
         input[type=range].ios-slider::-moz-range-thumb {
-            width:28px; height:28px; border-radius:50%; border:none;
-            background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.5);
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.5);
         }
-        .slider-labels { display:flex; justify-content:space-between; margin-top:2px; }
-        .slider-labels span { font-size:12px; color:var(--text2); }
-        .slider-val-display { font-weight:700; }
+        .slider-labels {
+            display: flex; justify-content: space-between; margin-top: 0;
+        }
+        .slider-labels span { font-size: 11px; color: var(--text3); }
+        .slider-val-display { font-weight: 700; color: var(--yellow) !important; }
 
-        /* لوحة الفلاتر */
-        .filters-row {
-            display:flex; gap:12px; overflow-x:auto; padding:12px 16px 20px;
-            scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+        /* ===== لوحة الفلاتر ===== */
+        .filters-scroll {
+            display: flex; gap: 10px; overflow-x: auto;
+            padding: 10px 16px 16px; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
         }
-        .filters-row::-webkit-scrollbar { display:none; }
+        .filters-scroll::-webkit-scrollbar { display: none; }
         .filter-item {
-            flex-shrink:0; width:88px; display:flex; flex-direction:column;
-            align-items:center; gap:8px; cursor:pointer; scroll-snap-align:start;
+            flex-shrink: 0; width: 82px; display: flex;
+            flex-direction: column; align-items: center; gap: 6px;
+            cursor: pointer; scroll-snap-align: start;
         }
-        .filter-img-wrap {
-            width:88px; height:88px; border-radius:14px; overflow:hidden;
-            border:3px solid transparent; transition:border-color 0.2s;
+        .filter-thumb {
+            width: 82px; height: 82px; border-radius: 50%;
+            overflow: hidden; border: 2.5px solid transparent;
+            transition: border-color 0.2s;
         }
-        .filter-item.active .filter-img-wrap { border-color:var(--yellow); }
-        .filter-img-wrap canvas { width:100%; height:100%; display:block; }
-        .filter-item span { font-size:11px; color:var(--text2); transition:color 0.2s; }
-        .filter-item.active span { color:var(--yellow); font-weight:600; }
+        .filter-item.active .filter-thumb { border-color: var(--yellow); }
+        .filter-thumb canvas { width: 100%; height: 100%; display: block; }
+        .filter-item span {
+            font-size: 10px; color: var(--text2); transition: color 0.2s;
+        }
+        .filter-item.active span { color: var(--yellow); font-weight: 600; }
 
-        /* لوحة القص */
-        .crop-ratios { display:flex; gap:10px; flex-wrap:wrap; padding:0 20px; margin-bottom:16px; }
+        /* ===== لوحة القص ===== */
+        .crop-ratios {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            padding: 4px 18px; margin-bottom: 14px; justify-content: center;
+        }
         .crop-r-btn {
-            padding:8px 18px; border-radius:20px; background:var(--card2);
-            border:none; color:var(--text); font-family:inherit; font-size:14px;
-            cursor:pointer; transition:background 0.2s, color 0.2s;
+            padding: 7px 16px; border-radius: 20px;
+            background: var(--card2); border: none; color: var(--text);
+            font-family: inherit; font-size: 13px; cursor: pointer;
+            transition: all 0.2s;
         }
-        .crop-r-btn.active { background:var(--yellow); color:#000; font-weight:600; }
-        .crop-hint { text-align:center; color:var(--text2); font-size:14px; line-height:1.6; padding:0 20px; }
-        .crop-actions { display:flex; justify-content:center; gap:12px; margin-top:20px; padding:0 20px; }
+        .crop-r-btn.active { background: var(--yellow); color: #000; font-weight: 600; }
+        .crop-hint {
+            text-align: center; color: var(--text2);
+            font-size: 14px; line-height: 1.6; padding: 0 20px;
+        }
+        .crop-actions {
+            display: flex; justify-content: center; gap: 10px;
+            margin-top: 18px; padding: 0 20px;
+        }
         .crop-act-btn {
-            padding:12px 28px; border-radius:12px; border:none;
-            font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;
-            display:flex; align-items:center; gap:8px; transition:transform 0.15s, opacity 0.15s;
+            padding: 11px 26px; border-radius: 12px; border: none;
+            font-family: inherit; font-size: 15px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 7px;
+            transition: transform 0.12s;
         }
-        .crop-act-btn:active { transform:scale(0.96); opacity:0.8; }
-        .crop-act-btn.primary { background:var(--yellow); color:#000; }
-        .crop-act-btn.secondary { background:var(--card2); color:var(--text); }
+        .crop-act-btn:active { transform: scale(0.96); }
+        .crop-act-btn.primary { background: var(--yellow); color: #000; }
+        .crop-act-btn.secondary { background: var(--card2); color: var(--text); }
 
-        /* لوحة التدوير */
-        .rotate-btns { display:flex; justify-content:center; gap:30px; padding:16px 0; }
+        /* ===== لوحة التدوير ===== */
+        .rotate-btns {
+            display: flex; justify-content: center; gap: 28px; padding: 14px 0;
+        }
         .rot-btn {
-            width:68px; height:68px; border-radius:50%; background:var(--card2);
-            border:none; color:var(--text); font-size:22px; cursor:pointer;
-            display:flex; align-items:center; justify-content:center;
-            transition:transform 0.15s, background 0.2s;
+            width: 64px; height: 64px; border-radius: 50%;
+            background: var(--card2); border: none; color: var(--text);
+            font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.12s, background 0.15s;
         }
-        .rot-btn:active { transform:scale(0.9); background:var(--sep); }
-        .rotate-slider-area { padding:8px 24px 0; }
-        .flip-row { display:flex; justify-content:center; gap:16px; padding:20px 16px 0; }
+        .rot-btn:active { transform: scale(0.9); background: var(--sep); }
+        .rotate-slider-area { padding: 6px 22px 0; }
+        .flip-row {
+            display: flex; justify-content: center; gap: 14px; padding: 18px 16px 0;
+        }
         .flip-btn {
-            padding:10px 22px; border-radius:12px; background:var(--card2);
-            border:none; color:var(--text); font-family:inherit; font-size:14px;
-            cursor:pointer; display:flex; align-items:center; gap:8px; transition:background 0.2s;
+            padding: 10px 20px; border-radius: 12px;
+            background: var(--card2); border: none; color: var(--text);
+            font-family: inherit; font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; gap: 7px;
+            transition: transform 0.12s;
         }
-        .flip-btn:active { background:var(--sep); }
+        .flip-btn:active { transform: scale(0.96); }
 
-        /* لوحة التلقائي */
-        .auto-content { text-align:center; padding:30px 20px; color:var(--text2); font-size:15px; line-height:1.7; }
-        .auto-btn {
-            margin-top:20px; padding:14px 40px; border-radius:50px;
-            background:linear-gradient(135deg, var(--orange), var(--pink));
-            color:#fff; font-size:17px; font-weight:600; border:none;
-            font-family:inherit; cursor:pointer; transition:transform 0.15s;
+        /* ===== لوحة التلقائي ===== */
+        .auto-content {
+            text-align: center; padding: 28px 20px;
+            color: var(--text2); font-size: 15px; line-height: 1.7;
         }
-        .auto-btn:active { transform:scale(0.95); }
+        .auto-magic-btn {
+            margin-top: 18px; padding: 13px 38px; border-radius: 50px;
+            background: linear-gradient(135deg, var(--orange), var(--pink));
+            color: #fff; font-size: 17px; font-weight: 600;
+            border: none; font-family: inherit; cursor: pointer;
+            transition: transform 0.12s;
+        }
+        .auto-magic-btn:active { transform: scale(0.95); }
 
-        /* إشعار */
+        /* ===== إشعار ===== */
         .toast {
-            position:fixed; top:60px; left:50%; transform:translateX(-50%) translateY(-30px);
-            background:var(--card); border:1px solid var(--sep);
-            padding:12px 24px; border-radius:14px; font-size:15px; font-weight:500;
-            z-index:999; backdrop-filter:blur(20px); opacity:0;
-            transition:all 0.3s cubic-bezier(0.32,0.72,0,1); pointer-events:none;
+            position: fixed; top: 56px; left: 50%;
+            transform: translateX(-50%) translateY(-24px);
+            background: rgba(28,28,30,0.92);
+            -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            border: 0.5px solid var(--sep);
+            padding: 11px 22px; border-radius: 14px;
+            font-size: 15px; font-weight: 500; z-index: 999;
+            opacity: 0; transition: all 0.3s cubic-bezier(0.32,0.72,0,1);
+            pointer-events: none; white-space: nowrap;
         }
-        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* طبقة القص */
-        .crop-overlay {
-            position:fixed; inset:0; z-index:80; display:none; cursor:crosshair;
+        .crop-overlay-canvas {
+            position: fixed; inset: 0; z-index: 80; display: none; cursor: crosshair;
         }
-        .crop-overlay.show { display:block; }
+        .crop-overlay-canvas.show { display: block; }
 
         @media(min-width:768px) {
-            .tool-panel { max-width:500px; left:50%; transform:translate(-50%,100%); border-bottom-left-radius:20px; border-bottom-right-radius:20px; }
-            .tool-panel.open { transform:translate(-50%,0); }
+            .tool-panel {
+                max-width: 480px; left: 50%;
+                transform: translate(-50%, 100%);
+                border-bottom-left-radius: 16px;
+                border-bottom-right-radius: 16px;
+            }
+            .tool-panel.open { transform: translate(-50%, 0); }
         }
         @media(prefers-reduced-motion:reduce) {
             *{ transition-duration:0.01ms!important; animation-duration:0.01ms!important; }
@@ -286,7 +407,7 @@
 <!-- شاشة الرفع -->
 <div class="upload-screen" id="uploadScreen">
     <div class="upload-icon">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
         </svg>
     </div>
@@ -297,8 +418,8 @@
     <input type="file" id="fileInput" accept="image/*" hidden>
 </div>
 
-<!-- منطقة السحب -->
-<div class="drop-zone" id="dropZone"><span>أسقط الصورة هنا</span></div>
+<!-- سحب وإفلات -->
+<div class="drop-overlay" id="dropOverlay"><span>أسقط الصورة هنا</span></div>
 
 <!-- شريط علوي -->
 <div class="topbar" id="topbar">
@@ -314,26 +435,26 @@
 <div class="compare-badge" id="compareBadge">الأصل</div>
 
 <!-- طبقة القص -->
-<canvas class="crop-overlay" id="cropOverlay"></canvas>
+<canvas class="crop-overlay-canvas" id="cropOverlayCanvas"></canvas>
 
-<!-- شريط التبويبات -->
+<!-- شريط التبويبات السفلي (شكل حبوب آيفون) -->
 <div class="bottom-bar" id="bottomBar">
-    <div class="tabs">
+    <div class="tabs-pill">
         <button class="tab-btn" data-tab="auto">
             <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>
             <span>تلقائي</span>
         </button>
         <button class="tab-btn" data-tab="adjust">
             <svg viewBox="0 0 24 24"><path d="M3 17V19H9V17H3ZM3 5V7H13V5H3ZM13 21V19H21V17H13V15H11V21H13ZM7 9V11H3V13H7V15H9V9H7ZM21 13V11H11V13H21ZM15 9H17V7H21V5H17V3H15V9Z"/></svg>
-            <span>تعديل</span>
+            <span>Adjust</span>
         </button>
         <button class="tab-btn" data-tab="filters">
             <svg viewBox="0 0 24 24"><path d="M3 5H7L9 3H15L17 5H21V7H3V5ZM5 8H19V20C19 20.55 18.55 21 18 21H6C5.45 21 5 20.55 5 20V8ZM8 10V19H10V10H8ZM14 10V19H16V10H14Z"/></svg>
-            <span>فلاتر</span>
+            <span>Filters</span>
         </button>
         <button class="tab-btn" data-tab="crop">
             <svg viewBox="0 0 24 24"><path d="M17 15H7V7H9V13H15V7H17V15ZM5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3ZM5 5V19H19V5H5Z"/></svg>
-            <span>قص</span>
+            <span>Crop</span>
         </button>
         <button class="tab-btn" data-tab="rotate">
             <svg viewBox="0 0 24 24"><path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11H2.05C2.25 9.14 2.99 7.44 4.17 6.05L2.71 4.59L4.13 3.17L7.11 6.15V8.53ZM21.95 13H19.93C19.76 14.39 19.2 15.73 18.3 16.89L16.89 15.47V18.85L19.87 21.83L21.29 20.41L19.83 18.95C21.01 17.56 21.75 15.86 21.95 13ZM16 5H18V11H16V5ZM8 13H14V15H8V13Z"/></svg>
@@ -347,9 +468,9 @@
     <div class="panel-handle"></div>
     <div class="panel-body">
         <div class="auto-content">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="var(--orange)" style="margin-bottom:12px;opacity:0.7;"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="var(--orange)" style="margin-bottom:10px;opacity:0.65;"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>
             <p>تحسين تلقائي للصورة<br>يضبط الإضاءة والألوان والتباين</p>
-            <button class="auto-btn" id="autoBtn">تحسين تلقائي</button>
+            <button class="auto-magic-btn" id="autoBtn">تحسين تلقائي</button>
         </div>
     </div>
 </div>
@@ -358,7 +479,7 @@
 <div class="tool-panel" id="panelAdjust">
     <div class="panel-handle"></div>
     <div class="panel-body">
-        <div class="edit-tools-row" id="editToolsRow"></div>
+        <div class="edit-scroll" id="editScroll"></div>
         <div class="slider-area" id="sliderArea"></div>
     </div>
 </div>
@@ -367,7 +488,7 @@
 <div class="tool-panel" id="panelFilters">
     <div class="panel-handle"></div>
     <div class="panel-body">
-        <div class="filters-row" id="filtersRow"></div>
+        <div class="filters-scroll" id="filtersScroll"></div>
     </div>
 </div>
 
@@ -401,14 +522,18 @@
         </div>
         <div class="rotate-slider-area">
             <div class="slider-head">
-                <span>زاوية الدوران</span>
-                <button class="slider-reset" id="rotReset">إعادة تعيين</button>
+                <span class="slider-head-title">زاوية الدوران</span>
+                <button class="slider-reset-btn" id="rotReset">إعادة تعيين</button>
             </div>
             <div class="slider-track-wrap">
                 <div class="slider-track-bg"><div class="slider-track-fill" id="rotFill" style="width:50%"></div></div>
                 <input type="range" class="ios-slider" id="rotSlider" min="-180" max="180" value="0">
             </div>
-            <div class="slider-labels"><span>-180°</span><span id="rotVal" class="slider-val-display" style="color:var(--blue)">0°</span><span>180°</span></div>
+            <div class="slider-labels">
+                <span>-180°</span>
+                <span id="rotVal" class="slider-val-display">0°</span>
+                <span>180°</span>
+            </div>
         </div>
         <div class="flip-row">
             <button class="flip-btn" id="flipHBtn"><i class="fas fa-arrows-alt-h"></i> عكس أفقي</button>
@@ -421,22 +546,21 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== المتغيرات الأساسية =====
+// ===== المتغيرات =====
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
-const cropCanvas = document.getElementById('cropOverlay');
-const cropCtx = cropCanvas.getContext('2d');
+const cropOv = document.getElementById('cropOverlayCanvas');
+const cropOvCtx = cropOv.getContext('2d');
 const fileInput = document.getElementById('fileInput');
 
-let originalImage = null;      // الصورة الأصلية المحملة
-let workingImage = null;        // صورة العمل (بعد قص)
+let originalImage = null;
+let workingImage = null;
 let currentFilter = 'none';
 let flipH = false, flipV = false;
 let freeRotation = 0;
 let cropRatio = 'free';
 let isCropping = false;
 let cropStart = null, cropEnd = null;
-let appliedCrop = null;         // القص المطبق فعلياً
 let activeTool = null;
 let activePanel = null;
 let isComparing = false;
@@ -449,7 +573,7 @@ let adj = {
     definition:0, noise:0, vignette:0
 };
 
-// تعريفات الأدوات
+// تعريفات الأدوات بالظبط زي الصور
 const tools = [
     { id:'auto', label:'تلقائي', cls:'clr-auto',
       icon:'<path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/>' },
@@ -465,24 +589,24 @@ const tools = [
       icon:'<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2v20z"/>' },
     { id:'brightness', label:'السطوع', cls:'clr-brightness', min:-100, max:100,
       icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/>' },
-    { id:'blackpoint', label:'النقطة السوداء', cls:'clr-blackpoint', min:-100, max:100,
-      icon:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="#fff"/>' },
+    { id:'blackpoint', label:'السوداء', cls:'clr-blackpoint', min:-100, max:100,
+      icon:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3.5" fill="#fff"/>' },
     { id:'saturation', label:'التشبع', cls:'clr-saturation', min:-100, max:100,
-      icon:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6a6 6 0 0 1 0 12 6 6 0 0 1 0-12z" fill="rgba(255,255,255,0.3)"/>' },
+      icon:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6a6 6 0 0 1 0 12 6 6 0 0 1 0-12z" fill="rgba(255,255,255,0.25)"/>' },
     { id:'vibrance', label:'الحيوية', cls:'clr-vibrance', min:-100, max:100,
-      icon:'<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" opacity="0.3"/><path d="M12 2a10 10 0 0 1 0 20" fill="rgba(255,100,100,0.4)"/><path d="M12 2a10 10 0 0 0 0 20" fill="rgba(100,200,255,0.3)"/>' },
+      icon:'<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" opacity="0.25"/><path d="M12 2a10 10 0 0 1 0 20" fill="rgba(255,100,100,0.35)"/><path d="M12 2a10 10 0 0 0 0 20" fill="rgba(100,200,255,0.25)"/>' },
     { id:'warmth', label:'الدفء', cls:'clr-warmth', min:-100, max:100,
-      icon:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" fill="none"/><path d="M12 2a5 5 0 0 1 0 20" fill="rgba(255,159,10,0.4)"/>' },
+      icon:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" fill="none"/><path d="M12 2a5 5 0 0 1 0 20" fill="rgba(255,159,10,0.35)"/>' },
     { id:'tint', label:'الصبغة', cls:'clr-tint', min:-100, max:100,
-      icon:'<circle cx="12" cy="12" r="10" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12" stroke="rgba(100,210,255,0.6)" stroke-width="3"/>' },
+      icon:'<circle cx="12" cy="12" r="10" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12" stroke="rgba(100,210,255,0.5)" stroke-width="3" fill="none"/>' },
     { id:'sharpness', label:'الوضوح', cls:'clr-sharpness', min:0, max:100,
       icon:'<path d="M12 2l2.09 6.26L20.18 9.27l-5 4.87L16.36 21 12 17.77 7.64 21l1.18-6.86-5-4.87 6.09-1.01L12 2z"/>' },
     { id:'definition', label:'التحديد', cls:'clr-definition', min:-100, max:100,
-      icon:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7" opacity="0.5"/><circle cx="12" cy="12" r="10" opacity="0.25"/>' },
+      icon:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7" opacity="0.4"/><circle cx="12" cy="12" r="10" opacity="0.2"/>' },
     { id:'noise', label:'التشويش', cls:'clr-noise', min:0, max:100,
-      icon:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="8" r="1" fill="#fff"/><circle cx="15" cy="10" r="1" fill="#fff"/><circle cx="10" cy="15" r="1" fill="#fff"/><circle cx="16" cy="16" r="1" fill="#fff"/>' },
+      icon:'<circle cx="12" cy="12" r="10" fill="none"/><circle cx="8" cy="8" r="0.8" fill="#fff"/><circle cx="15" cy="10" r="0.8" fill="#fff"/><circle cx="10" cy="15" r="0.8" fill="#fff"/><circle cx="16" cy="16" r="0.8" fill="#fff"/><circle cx="13" cy="6" r="0.8" fill="#fff"/><circle cx="7" cy="14" r="0.8" fill="#fff"/>' },
     { id:'vignette', label:'الحواف', cls:'clr-vignette', min:-100, max:100,
-      icon:'<rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="12" cy="12" r="6"/>' }
+      icon:'<rect x="2" y="2" width="20" height="20" rx="3" fill="none"/><circle cx="12" cy="12" r="6" fill="none"/>' }
 ];
 
 // الفلاتر
@@ -512,8 +636,8 @@ function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+    clearTimeout(t._tm);
+    t._tm = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
 // ===== بناء فلتر CSS من التعديلات =====
@@ -522,25 +646,23 @@ function buildAdjustCSS() {
     let brightness = 100 + (a.brightness * 0.5) + (a.exposure * 0.5) + (a.brilliance * 0.2) + (a.highlights * 0.15) - (a.shadows * 0.1);
     let contrast = 100 + (a.contrast * 0.4) + (a.definition * 0.2) + (a.brilliance * 0.15);
     let saturate = 100 + (a.saturation * 0.8) + (a.vibrance * 0.4) + (a.brilliance * 0.2);
-
     brightness = Math.max(0, Math.min(250, brightness));
     contrast = Math.max(0, Math.min(250, contrast));
     saturate = Math.max(0, Math.min(300, saturate));
-
     let hueShift = a.warmth * 0.15 + a.tint * 0.1;
-    let f = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%)`;
-    if (Math.abs(hueShift) > 0.5) f += ` hue-rotate(${hueShift}deg)`;
+    let f = 'brightness(' + brightness + '%) contrast(' + contrast + '%) saturate(' + saturate + '%)';
+    if (Math.abs(hueShift) > 0.5) f += ' hue-rotate(' + hueShift + 'deg)';
     return f;
 }
 
 function getFullFilter() {
-    const fObj = filters.find(f => f.id === currentFilter);
+    const fObj = filters.find(function(f){ return f.id === currentFilter; });
     const adjF = buildAdjustCSS();
     if (!fObj || !fObj.css) return adjF;
     return fObj.css + ' ' + adjF;
 }
 
-// ===== رسم الصورة الرئيسية =====
+// ===== رسم الصورة =====
 function renderImage(useOriginal) {
     const img = workingImage || originalImage;
     if (!img) return;
@@ -569,11 +691,11 @@ function renderImage(useOriginal) {
         const str = Math.abs(adj.vignette) / 100;
         const grad = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)*0.3, w/2, h/2, Math.max(w,h)*0.7);
         if (adj.vignette < 0) {
-            grad.addColorStop(0, `rgba(255,255,255,${str * 0.5})`);
+            grad.addColorStop(0, 'rgba(255,255,255,' + (str * 0.5) + ')');
             grad.addColorStop(1, 'rgba(255,255,255,0)');
         } else {
             grad.addColorStop(0, 'rgba(0,0,0,0)');
-            grad.addColorStop(1, `rgba(0,0,0,${str * 0.7})`);
+            grad.addColorStop(1, 'rgba(0,0,0,' + (str * 0.7) + ')');
         }
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
@@ -589,7 +711,6 @@ function loadImage(file) {
         img.onload = function() {
             originalImage = img;
             workingImage = img;
-            appliedCrop = null;
             document.getElementById('uploadScreen').classList.add('hidden');
             document.getElementById('topbar').classList.add('show');
             document.getElementById('bottomBar').classList.add('show');
@@ -602,17 +723,17 @@ function loadImage(file) {
     reader.readAsDataURL(file);
 }
 
-document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => { if (e.target.files[0]) loadImage(e.target.files[0]); });
+document.getElementById('uploadBtn').addEventListener('click', function() { fileInput.click(); });
+fileInput.addEventListener('change', function(e) { if (e.target.files[0]) loadImage(e.target.files[0]); });
 
 // سحب وإفلات
-const dropZone = document.getElementById('dropZone');
-let dragCounter = 0;
-document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dropZone.classList.add('show'); });
-document.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter<=0){ dragCounter=0; dropZone.classList.remove('show'); } });
-document.addEventListener('dragover', e => e.preventDefault());
-document.addEventListener('drop', e => {
-    e.preventDefault(); dragCounter=0; dropZone.classList.remove('show');
+var dragC = 0;
+var dropOv = document.getElementById('dropOverlay');
+document.addEventListener('dragenter', function(e) { e.preventDefault(); dragC++; dropOv.classList.add('show'); });
+document.addEventListener('dragleave', function(e) { e.preventDefault(); dragC--; if(dragC<=0){dragC=0;dropOv.classList.remove('show');} });
+document.addEventListener('dragover', function(e) { e.preventDefault(); });
+document.addEventListener('drop', function(e) {
+    e.preventDefault(); dragC=0; dropOv.classList.remove('show');
     if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
 });
 
@@ -623,21 +744,21 @@ function resetAll(showMsg) {
     freeRotation = 0;
     isCropping = false; cropStart = null; cropEnd = null;
     activeTool = null;
-    Object.keys(adj).forEach(k => adj[k] = 0);
+    var keys = Object.keys(adj);
+    for (var i = 0; i < keys.length; i++) adj[keys[i]] = 0;
     workingImage = originalImage;
-    appliedCrop = null;
     document.getElementById('rotSlider').value = 0;
     document.getElementById('rotFill').style.width = '50%';
     document.getElementById('rotFill').classList.remove('neg');
     document.getElementById('rotVal').textContent = '0°';
-    cropCanvas.classList.remove('show');
-    updateModifiedStates();
+    cropOv.classList.remove('show');
+    updateModified();
     renderImage();
     if (showMsg) showToast('تم إعادة التعيين');
 }
 
 // ===== التبويبات =====
-const panelMap = {
+var panelMap = {
     auto: document.getElementById('panelAuto'),
     adjust: document.getElementById('panelAdjust'),
     filters: document.getElementById('panelFilters'),
@@ -645,111 +766,115 @@ const panelMap = {
     rotate: document.getElementById('panelRotate')
 };
 
-document.querySelectorAll('.tab-btn').forEach(tab => {
-    tab.addEventListener('click', () => {
-        if (!originalImage) return;
-        const name = tab.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+var tabBtns = document.querySelectorAll('.tab-btn');
+for (var ti = 0; ti < tabBtns.length; ti++) {
+    (function(tab) {
+        tab.addEventListener('click', function() {
+            if (!originalImage) return;
+            var name = tab.dataset.tab;
+            var allTabs = document.querySelectorAll('.tab-btn');
+            for (var j = 0; j < allTabs.length; j++) allTabs[j].classList.remove('active');
+            tab.classList.add('active');
 
-        // إغلاق كل اللوحات
-        Object.values(panelMap).forEach(p => p.classList.remove('open'));
+            // إغلاق كل اللوحات
+            var pKeys = Object.keys(panelMap);
+            for (var k = 0; k < pKeys.length; k++) panelMap[pKeys[k]].classList.remove('open');
 
-        // إلغاء القص لو مفيش قص
-        if (name !== 'crop') { isCropping = false; cropStart = null; cropEnd = null; cropCanvas.classList.remove('show'); renderImage(); }
-
-        panelMap[name].classList.add('open');
-        activePanel = name;
-
-        if (name === 'filters') buildFilterThumbs();
-        if (name === 'adjust') { buildEditTools(); }
-    });
-});
-
-// ===== بناء أدوات التعديل الدائرية =====
-function buildEditTools() {
-    const row = document.getElementById('editToolsRow');
-    row.innerHTML = '';
-    tools.forEach(tool => {
-        const btn = document.createElement('button');
-        btn.className = 'edit-circle' + (adj[tool.id] !== 0 ? ' modified' : '');
-        btn.id = 'ec-' + tool.id;
-        btn.innerHTML = `<div class="circle-icon ${tool.cls}"><svg viewBox="0 0 24 24">${tool.icon}</svg></div><span>${tool.label}</span>`;
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.edit-circle').forEach(e => e.classList.remove('active'));
-            btn.classList.add('active');
-            activeTool = tool.id;
-            if (tool.id === 'auto') {
-                applyAutoEnhance();
-            } else {
-                showSlider(tool);
+            if (name !== 'crop') {
+                isCropping = false; cropStart = null; cropEnd = null;
+                cropOv.classList.remove('show'); renderImage();
             }
+
+            panelMap[name].classList.add('open');
+            activePanel = name;
+
+            if (name === 'filters') buildFilterThumbs();
+            if (name === 'adjust') buildEditCircles();
         });
-        row.appendChild(btn);
-    });
+    })(tabBtns[ti]);
 }
 
-// تحديث حالة modified
-function updateModifiedStates() {
-    tools.forEach(t => {
-        const el = document.getElementById('ec-' + t.id);
-        if (el) { el.classList.toggle('modified', adj[t.id] !== 0); }
-    });
+// ===== بناء الأدوات الدائرية =====
+function buildEditCircles() {
+    var row = document.getElementById('editScroll');
+    row.innerHTML = '';
+    for (var i = 0; i < tools.length; i++) {
+        (function(tool) {
+            var btn = document.createElement('button');
+            btn.className = 'edit-circle ' + tool.cls + (adj[tool.id] !== 0 ? ' modified' : '');
+            btn.id = 'ec-' + tool.id;
+            btn.innerHTML = '<div class="circle-bg"><svg viewBox="0 0 24 24">' + tool.icon + '</svg></div><span>' + tool.label + '</span>';
+            btn.addEventListener('click', function() {
+                var allC = document.querySelectorAll('.edit-circle');
+                for (var j = 0; j < allC.length; j++) allC[j].classList.remove('active');
+                btn.classList.add('active');
+                activeTool = tool.id;
+                if (tool.id === 'auto') {
+                    applyAutoEnhance();
+                } else {
+                    showSlider(tool);
+                }
+            });
+            row.appendChild(btn);
+        })(tools[i]);
+    }
 }
 
-// ===== عرض السلايدر =====
+function updateModified() {
+    for (var i = 0; i < tools.length; i++) {
+        var el = document.getElementById('ec-' + tools[i].id);
+        if (el) {
+            if (adj[tools[i].id] !== 0) el.classList.add('modified');
+            else el.classList.remove('modified');
+        }
+    }
+}
+
+// ===== السلايدر =====
 function showSlider(tool) {
-    const area = document.getElementById('sliderArea');
-    const val = adj[tool.id] || 0;
-    const min = tool.min !== undefined ? tool.min : -100;
-    const max = tool.max !== undefined ? tool.max : 100;
-    const pct = ((val - min) / (max - min)) * 100;
-    const isNeg = val < (min < 0 ? 0 : min);
+    var area = document.getElementById('sliderArea');
+    var val = adj[tool.id] || 0;
+    var min = tool.min !== undefined ? tool.min : -100;
+    var max = tool.max !== undefined ? tool.max : 100;
+    var pct = ((val - min) / (max - min)) * 100;
 
-    area.innerHTML = `
-        <div class="slider-head">
-            <span>${tool.label}</span>
-            <button class="slider-reset" id="sReset">إعادة تعيين</button>
-        </div>
-        <div class="slider-track-wrap">
-            <div class="slider-track-bg"><div class="slider-track-fill ${isNeg?'neg':''}" id="sFill" style="width:${pct}%"></div></div>
-            <input type="range" class="ios-slider" id="sSlider" min="${min}" max="${max}" value="${val}" step="1">
-        </div>
-        <div class="slider-labels">
-            <span>${min}</span>
-            <span id="sVal" class="slider-val-display" style="color:${isNeg?'var(--orange)':'var(--blue)'}">${val}</span>
-            <span>${max}</span>
-        </div>
-    `;
+    area.innerHTML =
+        '<div class="slider-head">' +
+            '<span class="slider-head-title">' + tool.label + '</span>' +
+            '<button class="slider-reset-btn" id="sReset">إعادة تعيين</button>' +
+        '</div>' +
+        '<div class="slider-track-wrap">' +
+            '<div class="slider-track-bg"><div class="slider-track-fill" id="sFill" style="width:' + pct + '%"></div></div>' +
+            '<input type="range" class="ios-slider" id="sSlider" min="' + min + '" max="' + max + '" value="' + val + '" step="1">' +
+        '</div>' +
+        '<div class="slider-labels">' +
+            '<span>' + min + '</span>' +
+            '<span id="sVal" class="slider-val-display">' + val + '</span>' +
+            '<span>' + max + '</span>' +
+        '</div>';
     area.classList.add('show');
 
-    const slider = document.getElementById('sSlider');
-    const fill = document.getElementById('sFill');
-    const valDisp = document.getElementById('sVal');
+    var slider = document.getElementById('sSlider');
+    var fill = document.getElementById('sFill');
+    var valDisp = document.getElementById('sVal');
 
-    slider.addEventListener('input', () => {
-        const v = parseInt(slider.value);
+    slider.addEventListener('input', function() {
+        var v = parseInt(slider.value);
         adj[tool.id] = v;
-        const p = ((v - min) / (max - min)) * 100;
+        var p = ((v - min) / (max - min)) * 100;
         fill.style.width = p + '%';
-        const neg = v < (min < 0 ? 0 : min);
-        fill.classList.toggle('neg', neg);
         valDisp.textContent = v;
-        valDisp.style.color = neg ? 'var(--orange)' : 'var(--blue)';
-        updateModifiedStates();
+        updateModified();
         renderImage();
     });
-    slider.addEventListener('change', () => {});
 
-    document.getElementById('sReset').addEventListener('click', () => {
+    document.getElementById('sReset').addEventListener('click', function() {
         adj[tool.id] = 0;
         slider.value = 0;
-        const p = ((0 - min) / (max - min)) * 100;
+        var p = ((0 - min) / (max - min)) * 100;
         fill.style.width = p + '%';
-        fill.classList.remove('neg');
         valDisp.textContent = '0';
-        valDisp.style.color = 'var(--blue)';
-        updateModifiedStates();
+        updateModified();
         renderImage();
     });
 }
@@ -759,333 +884,291 @@ function applyAutoEnhance() {
     adj.exposure = 10; adj.brilliance = 15; adj.highlights = -10;
     adj.shadows = 20; adj.contrast = 10; adj.saturation = 10;
     adj.vibrance = 15; adj.warmth = 5;
-    updateModifiedStates();
+    updateModified();
     renderImage();
     showToast('تم التحسين التلقائي');
-
-    // تحديث السلايدر لو مفتوح
     if (activeTool && activeTool !== 'auto') {
-        const tool = tools.find(t => t.id === activeTool);
-        if (tool) showSlider(tool);
+        var t = tools.find(function(x){ return x.id === activeTool; });
+        if (t) showSlider(t);
     }
 }
-
-document.getElementById('autoBtn').addEventListener('click', () => {
-    applyAutoEnhance();
-});
+document.getElementById('autoBtn').addEventListener('click', function() { applyAutoEnhance(); });
 
 // ===== معاينات الفلاتر =====
 function buildFilterThumbs() {
-    const row = document.getElementById('filtersRow');
+    var row = document.getElementById('filtersScroll');
     row.innerHTML = '';
     if (!originalImage) return;
-    const img = workingImage || originalImage;
-    const minD = Math.min(img.width, img.height);
-    const sx = (img.width - minD) / 2;
-    const sy = (img.height - minD) / 2;
+    var img = workingImage || originalImage;
+    var minD = Math.min(img.width, img.height);
+    var sx = (img.width - minD) / 2;
+    var sy = (img.height - minD) / 2;
 
-    filters.forEach(f => {
-        const item = document.createElement('div');
-        item.className = 'filter-item' + (f.id === currentFilter ? ' active' : '');
+    for (var i = 0; i < filters.length; i++) {
+        (function(f) {
+            var item = document.createElement('div');
+            item.className = 'filter-item' + (f.id === currentFilter ? ' active' : '');
 
-        const wrap = document.createElement('div');
-        wrap.className = 'filter-img-wrap';
-        const c = document.createElement('canvas');
-        c.width = 88; c.height = 88;
-        const tctx = c.getContext('2d');
-        if (f.css) tctx.filter = f.css;
-        tctx.drawImage(img, sx, sy, minD, minD, 0, 0, 88, 88);
-        wrap.appendChild(c);
+            var wrap = document.createElement('div');
+            wrap.className = 'filter-thumb';
+            var c = document.createElement('canvas');
+            c.width = 82; c.height = 82;
+            var tctx = c.getContext('2d');
+            if (f.css) tctx.filter = f.css;
+            tctx.drawImage(img, sx, sy, minD, minD, 0, 0, 82, 82);
+            wrap.appendChild(c);
 
-        const label = document.createElement('span');
-        label.textContent = f.label;
+            var label = document.createElement('span');
+            label.textContent = f.label;
 
-        item.appendChild(wrap);
-        item.appendChild(label);
+            item.appendChild(wrap);
+            item.appendChild(label);
 
-        item.addEventListener('click', () => {
-            currentFilter = f.id;
-            document.querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-            renderImage();
-        });
+            item.addEventListener('click', function() {
+                currentFilter = f.id;
+                var allF = document.querySelectorAll('.filter-item');
+                for (var j = 0; j < allF.length; j++) allF[j].classList.remove('active');
+                item.classList.add('active');
+                renderImage();
+            });
 
-        row.appendChild(item);
-    });
+            row.appendChild(item);
+        })(filters[i]);
+    }
 }
 
 // ===== القص =====
-document.querySelectorAll('.crop-r-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.crop-r-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        cropRatio = btn.dataset.ratio;
-        isCropping = false; cropStart = null; cropEnd = null;
-        cropCanvas.classList.remove('show');
-        renderImage();
-    });
-});
+var cropRBtns = document.querySelectorAll('.crop-r-btn');
+for (var ci = 0; ci < cropRBtns.length; ci++) {
+    (function(btn) {
+        btn.addEventListener('click', function() {
+            var allR = document.querySelectorAll('.crop-r-btn');
+            for (var j = 0; j < allR.length; j++) allR[j].classList.remove('active');
+            btn.classList.add('active');
+            cropRatio = btn.dataset.ratio;
+            isCropping = false; cropStart = null; cropEnd = null;
+            cropOv.classList.remove('show');
+            renderImage();
+        });
+    })(cropRBtns[ci]);
+}
 
-// رسم القص على طبقة منفصلة
 function drawCropOverlay() {
-    if (!isCropping || !cropStart || !cropEnd) return;
-    const rect = canvas.getBoundingClientRect();
-    cropCanvas.width = rect.width;
-    cropCanvas.height = rect.height;
-    cropCanvas.style.width = rect.width + 'px';
-    cropCanvas.style.height = rect.height + 'px';
-    cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+    if (!cropStart || !cropEnd) return;
+    var rect = canvas.getBoundingClientRect();
+    cropOv.width = rect.width;
+    cropOv.height = rect.height;
+    cropOv.style.width = rect.width + 'px';
+    cropOv.style.height = rect.height + 'px';
+    cropOvCtx.clearRect(0, 0, cropOv.width, cropOv.height);
 
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    var x1 = Math.min(cropStart.x, cropEnd.x);
+    var y1 = Math.min(cropStart.y, cropEnd.y);
+    var x2 = Math.max(cropStart.x, cropEnd.x);
+    var y2 = Math.max(cropStart.y, cropEnd.y);
 
-    let x1 = Math.min(cropStart.x, cropEnd.x);
-    let y1 = Math.min(cropStart.y, cropEnd.y);
-    let x2 = Math.max(cropStart.x, cropEnd.x);
-    let y2 = Math.max(cropStart.y, cropEnd.y);
-
-    // تطبيق نسبة القص
     if (cropRatio !== 'free') {
-        const [rw, rh] = cropRatio.split(':').map(Number);
-        const ratio = rw / rh;
-        const cw = x2 - x1;
-        const ch = y2 - y1;
-        if (cw / ch > ratio) {
-            const newW = ch * ratio;
-            x2 = x1 + newW;
-        } else {
-            const newH = cw / ratio;
-            y2 = y1 + newH;
-        }
+        var parts = cropRatio.split(':');
+        var rw = parseInt(parts[0]);
+        var rh = parseInt(parts[1]);
+        var ratio = rw / rh;
+        var cw = x2 - x1;
+        var ch = y2 - y1;
+        if (cw / ch > ratio) { x2 = x1 + ch * ratio; }
+        else { y2 = y1 + cw / ratio; }
     }
 
-    // منطقة معتمة
-    cropCtx.fillStyle = 'rgba(0,0,0,0.5)';
-    cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
-    cropCtx.clearRect(x1, y1, x2-x1, y2-y1);
+    cropOvCtx.fillStyle = 'rgba(0,0,0,0.5)';
+    cropOvCtx.fillRect(0, 0, cropOv.width, cropOv.height);
+    cropOvCtx.clearRect(x1, y1, x2 - x1, y2 - y1);
 
-    // إطار
-    cropCtx.strokeStyle = '#fff';
-    cropCtx.lineWidth = 1.5;
-    cropCtx.setLineDash([6, 4]);
-    cropCtx.strokeRect(x1, y1, x2-x1, y2-y1);
-    cropCtx.setLineDash([]);
+    cropOvCtx.strokeStyle = '#ffffff';
+    cropOvCtx.lineWidth = 1;
+    cropOvCtx.setLineDash([5, 3]);
+    cropOvCtx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    cropOvCtx.setLineDash([]);
 
     // خطوط الأthirds
-    cropCtx.strokeStyle = 'rgba(255,255,255,0.3)';
-    cropCtx.lineWidth = 0.5;
-    const tw = (x2-x1)/3, th = (y2-y1)/3;
-    for (let i=1; i<3; i++) {
-        cropCtx.beginPath(); cropCtx.moveTo(x1+tw*i, y1); cropCtx.lineTo(x1+tw*i, y2); cropCtx.stroke();
-        cropCtx.beginPath(); cropCtx.moveTo(x1, y1+th*i); cropCtx.lineTo(x2, y1+th*i); cropCtx.stroke();
+    cropOvCtx.strokeStyle = 'rgba(255,255,255,0.25)';
+    cropOvCtx.lineWidth = 0.5;
+    var tw = (x2 - x1) / 3;
+    var th = (y2 - y1) / 3;
+    for (var i = 1; i < 3; i++) {
+        cropOvCtx.beginPath(); cropOvCtx.moveTo(x1 + tw * i, y1); cropOvCtx.lineTo(x1 + tw * i, y2); cropOvCtx.stroke();
+        cropOvCtx.beginPath(); cropOvCtx.moveTo(x1, y1 + th * i); cropOvCtx.lineTo(x2, y1 + th * i); cropOvCtx.stroke();
     }
 }
 
-// أحداث القص على طبقة منفصلة
-cropCanvas.addEventListener('touchstart', handleCropStart, {passive:false});
-cropCanvas.addEventListener('touchmove', handleCropMove, {passive:false});
-cropCanvas.addEventListener('touchend', handleCropEnd);
-cropCanvas.addEventListener('mousedown', handleCropStart);
-cropCanvas.addEventListener('mousemove', handleCropMove);
-cropCanvas.addEventListener('mouseup', handleCropEnd);
-
 function getCropPos(e) {
-    const rect = cropCanvas.getBoundingClientRect();
-    const touch = e.touches ? e.touches[0] : e;
+    var rect = cropOv.getBoundingClientRect();
+    var touch = e.touches ? e.touches[0] : e;
     return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
 }
 
-function handleCropStart(e) {
-    e.preventDefault();
-    isCropping = true;
-    cropStart = getCropPos(e);
-    cropEnd = { ...cropStart };
-}
+function handleCropStart(e) { e.preventDefault(); isCropping = true; cropStart = getCropPos(e); cropEnd = { x: cropStart.x, y: cropStart.y }; }
+function handleCropMove(e) { if (!isCropping) return; e.preventDefault(); cropEnd = getCropPos(e); drawCropOverlay(); }
+function handleCropEnd() { isCropping = false; drawCropOverlay(); }
 
-function handleCropMove(e) {
-    if (!isCropping) return;
-    e.preventDefault();
-    cropEnd = getCropPos(e);
-    drawCropOverlay();
-}
+cropOv.addEventListener('touchstart', handleCropStart, { passive: false });
+cropOv.addEventListener('touchmove', handleCropMove, { passive: false });
+cropOv.addEventListener('touchend', handleCropEnd);
+cropOv.addEventListener('mousedown', handleCropStart);
+cropOv.addEventListener('mousemove', handleCropMove);
+cropOv.addEventListener('mouseup', handleCropEnd);
 
-function handleCropEnd(e) {
-    if (!isCropping) return;
-    isCropping = false;
-    drawCropOverlay();
-}
-
-// تفعيل القص بالضغط على الصورة (لما لوحة القص مفتوحة)
-document.getElementById('imageArea').addEventListener('click', (e) => {
+// تفعيل القص
+document.getElementById('imageArea').addEventListener('click', function() {
     if (activePanel === 'crop' && !isCropping) {
-        cropCanvas.classList.add('show');
-        cropStart = null; cropEnd = null;
-        isCropping = false;
+        cropOv.classList.add('show');
+        cropStart = null; cropEnd = null; isCropping = false;
         showToast('اسحب على الصورة لتحديد منطقة القص');
     }
 });
 
 // تطبيق القص
-document.getElementById('cropApplyBtn').addEventListener('click', () => {
-    if (!cropStart || !cropEnd) { showToast('اسحب على الصورة أولاً لتحديد منطقة القص'); return; }
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+document.getElementById('cropApplyBtn').addEventListener('click', function() {
+    if (!cropStart || !cropEnd) { showToast('اسحب على الصورة أولاً'); return; }
+    var rect = canvas.getBoundingClientRect();
+    var scX = canvas.width / rect.width;
+    var scY = canvas.height / rect.height;
 
-    let x1 = Math.min(cropStart.x, cropEnd.x) * scaleX;
-    let y1 = Math.min(cropStart.y, cropEnd.y) * scaleY;
-    let x2 = Math.max(cropStart.x, cropEnd.x) * scaleX;
-    let y2 = Math.max(cropStart.y, cropEnd.y) * scaleY;
+    var x1 = Math.min(cropStart.x, cropEnd.x) * scX;
+    var y1 = Math.min(cropStart.y, cropEnd.y) * scY;
+    var x2 = Math.max(cropStart.x, cropEnd.x) * scX;
+    var y2 = Math.max(cropStart.y, cropEnd.y) * scY;
 
     if (cropRatio !== 'free') {
-        const [rw, rh] = cropRatio.split(':').map(Number);
-        const ratio = rw / rh;
-        const cw = x2 - x1;
-        const ch = y2 - y1;
-        if (cw / ch > ratio) { const nw = ch * ratio; x2 = x1 + nw; }
-        else { const nh = cw / ratio; y2 = y1 + nh; }
+        var parts = cropRatio.split(':');
+        var rw = parseInt(parts[0]);
+        var rh = parseInt(parts[1]);
+        var ratio = rw / rh;
+        var cw = x2 - x1;
+        var ch = y2 - y1;
+        if (cw / ch > ratio) { x2 = x1 + ch * ratio; }
+        else { y2 = y1 + cw / ratio; }
     }
 
     x1 = Math.max(0, Math.round(x1));
     y1 = Math.max(0, Math.round(y1));
     x2 = Math.min(canvas.width, Math.round(x2));
     y2 = Math.min(canvas.height, Math.round(y2));
-
-    const cw = x2 - x1;
-    const ch = y2 - y1;
+    var cw = x2 - x1;
+    var ch = y2 - y1;
     if (cw < 10 || ch < 10) { showToast('منطقة القص صغيرة جداً'); return; }
 
-    // رسم الصورة بدون فلاتر على كانفاس مؤقت
-    const img = workingImage || originalImage;
-    const rot = freeRotation * Math.PI / 180;
-    const absC = Math.abs(Math.cos(rot));
-    const absS = Math.abs(Math.sin(rot));
-    let fw = Math.ceil(img.width * absC + img.height * absS);
-    let fh = Math.ceil(img.width * absS + img.height * absC);
+    var img = workingImage || originalImage;
+    var rot = freeRotation * Math.PI / 180;
+    var absC = Math.abs(Math.cos(rot));
+    var absS = Math.abs(Math.sin(rot));
+    var fw = Math.ceil(img.width * absC + img.height * absS);
+    var fh = Math.ceil(img.width * absS + img.height * absC);
 
-    const tmpC = document.createElement('canvas');
+    var tmpC = document.createElement('canvas');
     tmpC.width = fw; tmpC.height = fh;
-    const tmpCtx = tmpC.getContext('2d');
-    tmpCtx.translate(fw/2, fh/2);
+    var tmpCtx = tmpC.getContext('2d');
+    tmpCtx.translate(fw / 2, fh / 2);
     tmpCtx.rotate(rot);
     tmpCtx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
-    tmpCtx.drawImage(img, -img.width/2, -img.height/2);
+    tmpCtx.drawImage(img, -img.width / 2, -img.height / 2);
 
-    // قص المنطقة
-    const cropped = document.createElement('canvas');
+    var cropped = document.createElement('canvas');
     cropped.width = cw; cropped.height = ch;
-    const crCtx = cropped.getContext('2d');
+    var crCtx = cropped.getContext('2d');
     crCtx.drawImage(tmpC, x1, y1, cw, ch, 0, 0, cw, ch);
 
-    // إنشاء صورة جديدة
-    const newImg = new Image();
+    var newImg = new Image();
     newImg.onload = function() {
         workingImage = newImg;
-        appliedCrop = { x: x1, y: y1, w: cw, h: ch };
-        freeRotation = 0;
-        flipH = false; flipV = false;
+        freeRotation = 0; flipH = false; flipV = false;
         document.getElementById('rotSlider').value = 0;
         document.getElementById('rotFill').style.width = '50%';
         document.getElementById('rotVal').textContent = '0°';
         cropStart = null; cropEnd = null;
-        cropCanvas.classList.remove('show');
+        cropOv.classList.remove('show');
         renderImage();
         showToast('تم تطبيق القص');
     };
     newImg.src = cropped.toDataURL();
 });
 
-document.getElementById('cropCancelBtn').addEventListener('click', () => {
+document.getElementById('cropCancelBtn').addEventListener('click', function() {
     isCropping = false; cropStart = null; cropEnd = null;
-    cropCanvas.classList.remove('show');
-    renderImage();
+    cropOv.classList.remove('show'); renderImage();
 });
 
 // ===== التدوير =====
-document.getElementById('rotLeft').addEventListener('click', () => {
-    freeRotation = (freeRotation - 90 + 360) % 360;
+document.getElementById('rotLeft').addEventListener('click', function() {
+    freeRotation = ((freeRotation - 90) % 360 + 360) % 360;
     if (freeRotation > 180) freeRotation -= 360;
-    updateRotSlider();
-    renderImage();
+    updateRotSlider(); renderImage();
 });
-
-document.getElementById('rotRight').addEventListener('click', () => {
-    freeRotation = (freeRotation + 90) % 360;
+document.getElementById('rotRight').addEventListener('click', function() {
+    freeRotation = ((freeRotation + 90) % 360 + 360) % 360;
     if (freeRotation > 180) freeRotation -= 360;
-    updateRotSlider();
-    renderImage();
+    updateRotSlider(); renderImage();
 });
 
 function updateRotSlider() {
-    const s = document.getElementById('rotSlider');
-    s.value = freeRotation;
-    const pct = ((freeRotation + 180) / 360) * 100;
+    document.getElementById('rotSlider').value = freeRotation;
+    var pct = ((freeRotation + 180) / 360) * 100;
     document.getElementById('rotFill').style.width = pct + '%';
     document.getElementById('rotFill').classList.toggle('neg', freeRotation < 0);
     document.getElementById('rotVal').textContent = freeRotation + '°';
-    document.getElementById('rotVal').style.color = freeRotation < 0 ? 'var(--orange)' : 'var(--blue)';
 }
 
-document.getElementById('rotSlider').addEventListener('input', (e) => {
-    freeRotation = parseInt(e.target.value);
-    updateRotSlider();
-    renderImage();
+document.getElementById('rotSlider').addEventListener('input', function() {
+    freeRotation = parseInt(this.value);
+    updateRotSlider(); renderImage();
 });
 
-document.getElementById('rotReset').addEventListener('click', () => {
-    freeRotation = 0;
-    updateRotSlider();
-    renderImage();
+document.getElementById('rotReset').addEventListener('click', function() {
+    freeRotation = 0; updateRotSlider(); renderImage();
 });
 
-document.getElementById('flipHBtn').addEventListener('click', () => { flipH = !flipH; renderImage(); showToast(flipH ? 'عكس أفقي' : 'إلغاء العكس الأفقي'); });
-document.getElementById('flipVBtn').addEventListener('click', () => { flipV = !flipV; renderImage(); showToast(flipV ? 'عكس رأسي' : 'إلغاء العكس الرأسي'); });
+document.getElementById('flipHBtn').addEventListener('click', function() {
+    flipH = !flipH; renderImage(); showToast(flipH ? 'عكس أفقي' : 'إلغاء العكس الأفقي');
+});
+document.getElementById('flipVBtn').addEventListener('click', function() {
+    flipV = !flipV; renderImage(); showToast(flipV ? 'عكس رأسي' : 'إلغاء العكس الرأسي');
+});
 
-// ===== قبل/بعد (بالضغط المطول على الصورة) =====
-let compareTimer = null;
-canvas.addEventListener('pointerdown', (e) => {
+// ===== قبل/بعد =====
+var cmpTimer = null;
+canvas.addEventListener('pointerdown', function() {
     if (activePanel) return;
-    compareTimer = setTimeout(() => {
+    cmpTimer = setTimeout(function() {
         isComparing = true;
         document.getElementById('compareBadge').classList.add('show');
         renderImage(true);
     }, 400);
 });
-canvas.addEventListener('pointerup', () => {
-    clearTimeout(compareTimer);
+canvas.addEventListener('pointerup', endCompare);
+canvas.addEventListener('pointerleave', endCompare);
+function endCompare() {
+    clearTimeout(cmpTimer);
     if (isComparing) {
         isComparing = false;
         document.getElementById('compareBadge').classList.remove('show');
         renderImage();
     }
-});
-canvas.addEventListener('pointerleave', () => {
-    clearTimeout(compareTimer);
-    if (isComparing) {
-        isComparing = false;
-        document.getElementById('compareBadge').classList.remove('show');
-        renderImage();
-    }
-});
+}
 
-// ===== زر إلغاء =====
-document.getElementById('btnCancel').addEventListener('click', () => {
+// ===== إلغاء =====
+document.getElementById('btnCancel').addEventListener('click', function() {
     closeAllPanels();
-    resetAll(true);
-    originalImage = null;
-    workingImage = null;
+    resetAll(false);
+    originalImage = null; workingImage = null;
     document.getElementById('uploadScreen').classList.remove('hidden');
     document.getElementById('topbar').classList.remove('show');
     document.getElementById('bottomBar').classList.remove('show');
     fileInput.value = '';
 });
 
-// ===== زر تم (حفظ/تحميل) =====
-document.getElementById('btnDone').addEventListener('click', () => {
+// ===== تم (حفظ) =====
+document.getElementById('btnDone').addEventListener('click', function() {
     if (!originalImage) return;
-    // رسم النسخة النهائية
     renderImage(false);
-    const link = document.createElement('a');
+    var link = document.createElement('a');
     link.download = 'edited_photo.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
@@ -1094,70 +1177,59 @@ document.getElementById('btnDone').addEventListener('click', () => {
 
 // ===== إغلاق اللوحات =====
 function closeAllPanels() {
-    Object.values(panelMap).forEach(p => p.classList.remove('open'));
+    var pKeys = Object.keys(panelMap);
+    for (var i = 0; i < pKeys.length; i++) panelMap[pKeys[i]].classList.remove('open');
     activePanel = null;
-    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    var allTabs = document.querySelectorAll('.tab-btn');
+    for (var j = 0; j < allTabs.length; j++) allTabs[j].classList.remove('active');
     activeTool = null;
     isCropping = false; cropStart = null; cropEnd = null;
-    cropCanvas.classList.remove('show');
+    cropOv.classList.remove('show');
     document.getElementById('sliderArea').classList.remove('show');
     renderImage();
 }
 
-// إغلاق اللوحة بالضغط على Handle
-document.querySelectorAll('.panel-handle').forEach(handle => {
-    handle.addEventListener('click', () => closeAllPanels());
-    handle.style.cursor = 'pointer';
-});
+// سحب للأسفل لإغلاق
+var allHandles = document.querySelectorAll('.panel-handle');
+for (var hi = 0; hi < allHandles.length; hi++) {
+    (function(handle) {
+        var panel = handle.closest('.tool-panel');
+        var startY = 0;
 
-// ===== إغلاق اللوحة بالسحب للأسفل =====
-document.querySelectorAll('.tool-panel').forEach(panel => {
-    let startY = 0, startTransform = 0;
-    const handle = panel.querySelector('.panel-handle');
-
-    function onStart(e) {
-        const touch = e.touches ? e.touches[0] : e;
-        startY = touch.clientY;
-        startTransform = panel.classList.contains('open') ? 0 : panel.offsetHeight;
-        panel.style.transition = 'none';
-    }
-
-    function onMove(e) {
-        const touch = e.touches ? e.touches[0] : e;
-        const dy = touch.clientY - startY;
-        if (dy > 0 && panel.classList.contains('open')) {
-            panel.style.transform = `translateY(${dy}px)`;
+        function onS(e) {
+            var t = e.touches ? e.touches[0] : e;
+            startY = t.clientY;
+            panel.style.transition = 'none';
         }
-    }
-
-    function onEnd(e) {
-        const touch = e.changedTouches ? e.changedTouches[0] : e;
-        const dy = touch.clientY - startY;
-        panel.style.transition = '';
-        panel.style.transform = '';
-        if (dy > 80) {
-            closeAllPanels();
-        } else {
-            if (panel.classList.contains('open')) {
-                panel.style.transform = '';
+        function onM(e) {
+            var t = e.touches ? e.touches[0] : e;
+            var dy = t.clientY - startY;
+            if (dy > 0 && panel.classList.contains('open')) {
+                panel.style.transform = 'translateY(' + dy + 'px)';
             }
         }
-    }
+        function onE(e) {
+            var t = e.changedTouches ? e.changedTouches[0] : e;
+            var dy = t.clientY - startY;
+            panel.style.transition = '';
+            panel.style.transform = '';
+            if (dy > 70) closeAllPanels();
+        }
 
-    handle.addEventListener('touchstart', onStart, {passive:true});
-    handle.addEventListener('touchmove', onMove, {passive:true});
-    handle.addEventListener('touchend', onEnd);
-    handle.addEventListener('mousedown', onStart);
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onEnd);
-});
+        handle.addEventListener('touchstart', onS, { passive: true });
+        handle.addEventListener('touchmove', onM, { passive: true });
+        handle.addEventListener('touchend', onE);
+        handle.addEventListener('mousedown', onS);
+        document.addEventListener('mousemove', onM);
+        document.addEventListener('mouseup', onE);
+    })(allHandles[hi]);
+}
 
-// ===== اختصارات لوحة المفاتيح =====
-document.addEventListener('keydown', (e) => {
+// ===== اختصارات =====
+document.addEventListener('keydown', function(e) {
     if (!originalImage) return;
     if (e.key === 'Escape') closeAllPanels();
-    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); /* could add undo */ }
 });
-    </script>
+</script>
 </body>
 </html>

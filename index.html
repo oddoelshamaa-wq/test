@@ -4,1651 +4,1160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>الصور</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --ios-bg: #000000;
-            --ios-card: #1c1c1e;
-            --ios-card2: #2c2c2e;
-            --ios-sep: #38383a;
-            --ios-text: #ffffff;
-            --ios-text2: #8e8e93;
-            --ios-blue: #0a84ff;
-            --ios-orange: #ff9f0a;
-            --ios-red: #ff453a;
-            --ios-green: #30d158;
-            --ios-teal: #64d2ff;
-            --ios-purple: #bf5af2;
-            --ios-pink: #ff375f;
-            --ios-yellow: #ffd60a;
+            --bg: #000000;
+            --card: #1c1c1e;
+            --card2: #2c2c2e;
+            --sep: #38383a;
+            --text: #ffffff;
+            --text2: #8e8e93;
+            --blue: #0a84ff;
+            --orange: #ff9f0a;
+            --red: #ff453a;
+            --green: #30d158;
+            --teal: #64d2ff;
+            --purple: #bf5af2;
+            --pink: #ff375f;
+            --yellow: #ffd60a;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-            background: var(--ios-bg);
-            color: var(--ios-text);
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            position: fixed;
-            top: 0; left: 0;
-            user-select: none;
+            background: var(--bg); color: var(--text);
+            height: 100vh; width: 100vw; overflow: hidden;
+            position: fixed; top:0; left:0; user-select: none;
         }
 
-        /* ===== شريط علوي زي الآيفون ===== */
-        .ios-topbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 96px;
-            padding-top: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-left: 16px;
-            padding-right: 16px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .ios-topbar.visible {
-            opacity: 1;
-        }
-
-        .ios-btn-cancel {
-            font-size: 17px;
-            color: var(--ios-text);
-            background: none;
-            border: none;
-            font-family: inherit;
-            cursor: pointer;
-            padding: 8px 4px;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-
-        .ios-btn-cancel:hover { opacity: 1; }
-
-        .ios-btn-done {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--ios-blue);
-            background: none;
-            border: none;
-            font-family: inherit;
-            cursor: pointer;
-            padding: 8px 4px;
-            transition: opacity 0.2s;
-        }
-
-        .ios-btn-done:hover { opacity: 0.7; }
-
-        .ios-top-title {
-            font-size: 17px;
-            font-weight: 600;
-        }
-
-        /* ===== منطقة الصورة ===== */
-        .image-area {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-
-        #mainCanvas {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        /* ===== شاشة الرفع ===== */
+        /* شاشة الرفع */
         .upload-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            background: var(--ios-bg);
-            gap: 24px;
+            position: fixed; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 500;
+            background: var(--bg); gap: 20px;
         }
-
-        .upload-screen.hidden {
-            display: none;
+        .upload-screen.hidden { display: none; }
+        .upload-icon { width:100px; height:100px; border-radius:28px; background:var(--card);
+            display:flex; align-items:center; justify-content:center; color:var(--blue); font-size:44px; }
+        .upload-title { font-size:24px; font-weight:700; }
+        .upload-sub { font-size:15px; color:var(--text2); text-align:center; line-height:1.5; }
+        .upload-btn {
+            margin-top:8px; padding:14px 44px; border-radius:14px;
+            background:var(--blue); color:#fff; font-size:17px; font-weight:600;
+            border:none; font-family:inherit; cursor:pointer;
+            transition: transform 0.15s, opacity 0.15s;
         }
-
-        .upload-icon-wrap {
-            width: 100px;
-            height: 100px;
-            border-radius: 28px;
-            background: var(--ios-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 44px;
-            color: var(--ios-blue);
+        .upload-btn:active { transform:scale(0.96); opacity:0.8; }
+        .upload-hint { font-size:12px; color:var(--text2); opacity:0.5; }
+        .drop-zone {
+            position:fixed; inset:0; z-index:499; display:none;
+            align-items:center; justify-content:center;
+            background:rgba(10,132,255,0.15); backdrop-filter:blur(10px);
+            border:3px dashed var(--blue); border-radius:0;
         }
+        .drop-zone.show { display:flex; }
+        .drop-zone span { font-size:22px; font-weight:600; color:var(--blue); }
 
-        .upload-title {
-            font-size: 22px;
-            font-weight: 700;
+        /* شريط علوي */
+        .topbar {
+            position:fixed; top:0; left:0; right:0; height:96px;
+            padding-top:48px; display:flex; align-items:center;
+            justify-content:space-between; padding-left:16px; padding-right:16px;
+            background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
+            z-index:100; opacity:0; transition:opacity 0.3s; pointer-events:none;
         }
+        .topbar.show { opacity:1; pointer-events:auto; }
+        .topbar button { font-size:17px; background:none; border:none; font-family:inherit; cursor:pointer; padding:8px 4px; }
+        .btn-cancel { color:var(--text); opacity:0.8; }
+        .btn-done { color:var(--blue); font-weight:600; }
+        .top-title { font-size:17px; font-weight:600; }
 
-        .upload-subtitle {
-            font-size: 15px;
-            color: var(--ios-text2);
-            text-align: center;
-            line-height: 1.5;
+        /* منطقة الصورة */
+        .image-area { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:1; }
+        #mainCanvas { max-width:100%; max-height:100%; display:block; }
+
+        /* نصيحة قبل/بعد */
+        .compare-badge {
+            position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+            background:rgba(0,0,0,0.7); backdrop-filter:blur(10px);
+            padding:10px 24px; border-radius:20px; font-size:15px; font-weight:600;
+            z-index:90; opacity:0; transition:opacity 0.2s; pointer-events:none;
         }
+        .compare-badge.show { opacity:1; }
 
-        .ios-upload-btn {
-            margin-top: 12px;
-            padding: 14px 40px;
-            border-radius: 14px;
-            background: var(--ios-blue);
-            color: #fff;
-            font-size: 17px;
-            font-weight: 600;
-            border: none;
-            font-family: inherit;
-            cursor: pointer;
-            transition: transform 0.15s ease, opacity 0.15s ease;
+        /* شريط التبويبات السفلي */
+        .bottom-bar {
+            position:fixed; bottom:0; left:0; right:0; z-index:100;
+            opacity:0; transition:opacity 0.3s; pointer-events:none;
         }
-
-        .ios-upload-btn:active {
-            transform: scale(0.96);
-            opacity: 0.8;
+        .bottom-bar.show { opacity:1; pointer-events:auto; }
+        .tabs {
+            display:flex; justify-content:space-around; align-items:center;
+            padding:8px 4px 28px;
+            background:linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.75) 70%, transparent 100%);
         }
-
-        .upload-hint-small {
-            font-size: 12px;
-            color: var(--ios-text2);
-            opacity: 0.6;
+        .tab-btn {
+            display:flex; flex-direction:column; align-items:center; gap:4px;
+            background:none; border:none; color:var(--text2); font-family:inherit;
+            font-size:10px; cursor:pointer; padding:6px 14px; border-radius:10px;
+            transition:color 0.2s;
         }
+        .tab-btn.active { color:var(--yellow); }
+        .tab-btn svg { width:22px; height:22px; fill:currentColor; }
+        .tab-btn.active svg { filter:drop-shadow(0 0 4px rgba(255,214,10,0.4)); }
 
-        /* ===== شريط أدوات سفلي ===== */
-        .ios-bottom-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .ios-bottom-bar.visible {
-            opacity: 1;
-        }
-
-        .ios-tabs {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 10px 8px 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
-        }
-
-        .ios-tab {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            background: none;
-            border: none;
-            color: var(--ios-text2);
-            font-family: inherit;
-            font-size: 10px;
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 10px;
-            transition: color 0.2s;
-        }
-
-        .ios-tab.active {
-            color: var(--ios-blue);
-        }
-
-        .ios-tab svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        /* ===== لوحات الأدوات ===== */
+        /* لوحة الأدوات */
         .tool-panel {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--ios-card);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            z-index: 150;
-            transform: translateY(100%);
-            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-            max-height: 55vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            position:fixed; bottom:0; left:0; right:0;
+            background:var(--card); border-top-left-radius:20px; border-top-right-radius:20px;
+            z-index:150; transform:translateY(100%);
+            transition:transform 0.38s cubic-bezier(0.32,0.72,0,1);
+            max-height:60vh; overflow:hidden; display:flex; flex-direction:column;
         }
+        .tool-panel.open { transform:translateY(0); }
+        .panel-handle { width:36px; height:5px; border-radius:3px; background:var(--sep); margin:8px auto 0; flex-shrink:0; }
+        .panel-body { flex:1; overflow-y:auto; padding:12px 0 36px; -webkit-overflow-scrolling:touch; }
+        .panel-body::-webkit-scrollbar { display:none; }
 
-        .tool-panel.open {
-            transform: translateY(0);
+        /* لوحة التعديل - الأدوات الدائرية */
+        .edit-tools-row {
+            display:flex; overflow-x:auto; gap:16px; padding:10px 16px 6px;
+            scrollbar-width:none; -webkit-overflow-scrolling:touch;
         }
+        .edit-tools-row::-webkit-scrollbar { display:none; }
 
-        .panel-handle {
-            width: 36px;
-            height: 5px;
-            border-radius: 3px;
-            background: var(--ios-sep);
-            margin: 8px auto 4px;
-            flex-shrink: 0;
+        .edit-circle {
+            flex:0 0 68px; display:flex; flex-direction:column; align-items:center;
+            gap:8px; background:none; border:none; cursor:pointer; outline:none; padding:0;
         }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 20px 12px;
-            flex-shrink: 0;
+        .circle-icon {
+            width:56px; height:56px; border-radius:50%;
+            background:#151515; border:2.5px solid #252525;
+            display:flex; align-items:center; justify-content:center;
+            transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+            position:relative;
         }
-
-        .panel-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--ios-text2);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .circle-icon svg { width:26px; height:26px; fill:none; stroke:#fff; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+        .edit-circle.active .circle-icon { border-color:var(--yellow); background:#0a0a0a; box-shadow:0 0 12px rgba(255,214,10,0.2); }
+        .edit-circle.modified .circle-icon::after {
+            content:''; position:absolute; inset:-5px;
+            border:2px solid var(--yellow); border-radius:50%;
         }
+        .edit-circle span { font-size:11px; color:var(--text2); font-weight:500; white-space:nowrap; transition:color 0.2s; }
+        .edit-circle.active span { color:#fff; font-weight:600; }
 
-        .panel-close {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--ios-card2);
-            border: none;
-            color: var(--ios-text2);
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* ألوان خلفية الأيقونات */
+        .clr-auto { background:rgba(255,159,10,0.18); }
+        .clr-exposure { background:rgba(10,132,255,0.18); }
+        .clr-brilliance { background:rgba(100,210,255,0.18); }
+        .clr-highlights { background:rgba(255,214,10,0.18); }
+        .clr-shadows { background:rgba(191,90,242,0.18); }
+        .clr-contrast { background:rgba(255,55,95,0.18); }
+        .clr-brightness { background:rgba(255,159,10,0.18); }
+        .clr-blackpoint { background:rgba(142,142,147,0.18); }
+        .clr-saturation { background:rgba(48,209,88,0.18); }
+        .clr-vibrance { background:rgba(255,55,95,0.18); }
+        .clr-warmth { background:rgba(255,159,10,0.18); }
+        .clr-tint { background:rgba(100,210,255,0.18); }
+        .clr-sharpness { background:rgba(10,132,255,0.18); }
+        .clr-definition { background:rgba(191,90,242,0.18); }
+        .clr-noise { background:rgba(142,142,147,0.18); }
+        .clr-vignette { background:rgba(255,55,95,0.18); }
+
+        /* سلايدر الآيفوني */
+        .slider-area { padding:10px 24px 0; display:none; }
+        .slider-area.show { display:block; }
+        .slider-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .slider-head span:first-child { font-size:15px; font-weight:600; }
+        .slider-reset { font-size:14px; color:var(--blue); background:none; border:none; font-family:inherit; cursor:pointer; }
+        .slider-track-wrap { position:relative; width:100%; height:28px; display:flex; align-items:center; }
+        .slider-track-bg { position:absolute; left:0; right:0; height:4px; border-radius:2px; background:var(--card2); overflow:hidden; }
+        .slider-track-fill { height:100%; border-radius:2px; background:var(--blue); width:50%; transition:width 0.04s; }
+        .slider-track-fill.neg { background:var(--orange); }
+        input[type=range].ios-slider {
+            -webkit-appearance:none; appearance:none; position:relative;
+            width:100%; height:28px; background:transparent; z-index:2; cursor:pointer;
         }
-
-        .panel-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 20px 34px;
-            -webkit-overflow-scrolling: touch;
+        input[type=range].ios-slider::-webkit-slider-thumb {
+            -webkit-appearance:none; width:28px; height:28px; border-radius:50%;
+            background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.15);
         }
-
-        .panel-body::-webkit-scrollbar { display: none; }
-
-        /* ===== الفلاتر - معاينات مصغرة ===== */
-        .filters-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 0 20px 34px;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
+        input[type=range].ios-slider::-moz-range-thumb {
+            width:28px; height:28px; border-radius:50%; border:none;
+            background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.5);
         }
+        .slider-labels { display:flex; justify-content:space-between; margin-top:2px; }
+        .slider-labels span { font-size:12px; color:var(--text2); }
+        .slider-val-display { font-weight:700; }
 
-        .filters-scroll::-webkit-scrollbar { display: none; }
-
-        .filter-thumb {
-            flex-shrink: 0;
-            width: 90px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            scroll-snap-align: start;
+        /* لوحة الفلاتر */
+        .filters-row {
+            display:flex; gap:12px; overflow-x:auto; padding:12px 16px 20px;
+            scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
         }
-
-        .filter-thumb-img {
-            width: 90px;
-            height: 90px;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 3px solid transparent;
-            transition: border-color 0.2s;
+        .filters-row::-webkit-scrollbar { display:none; }
+        .filter-item {
+            flex-shrink:0; width:88px; display:flex; flex-direction:column;
+            align-items:center; gap:8px; cursor:pointer; scroll-snap-align:start;
         }
-
-        .filter-thumb.active .filter-thumb-img {
-            border-color: var(--ios-blue);
+        .filter-img-wrap {
+            width:88px; height:88px; border-radius:14px; overflow:hidden;
+            border:3px solid transparent; transition:border-color 0.2s;
         }
+        .filter-item.active .filter-img-wrap { border-color:var(--yellow); }
+        .filter-img-wrap canvas { width:100%; height:100%; display:block; }
+        .filter-item span { font-size:11px; color:var(--text2); transition:color 0.2s; }
+        .filter-item.active span { color:var(--yellow); font-weight:600; }
 
-        .filter-thumb-img canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: cover;
+        /* لوحة القص */
+        .crop-ratios { display:flex; gap:10px; flex-wrap:wrap; padding:0 20px; margin-bottom:16px; }
+        .crop-r-btn {
+            padding:8px 18px; border-radius:20px; background:var(--card2);
+            border:none; color:var(--text); font-family:inherit; font-size:14px;
+            cursor:pointer; transition:background 0.2s, color 0.2s;
         }
-
-        .filter-thumb-label {
-            font-size: 11px;
-            color: var(--ios-text2);
-            transition: color 0.2s;
+        .crop-r-btn.active { background:var(--yellow); color:#000; font-weight:600; }
+        .crop-hint { text-align:center; color:var(--text2); font-size:14px; line-height:1.6; padding:0 20px; }
+        .crop-actions { display:flex; justify-content:center; gap:12px; margin-top:20px; padding:0 20px; }
+        .crop-act-btn {
+            padding:12px 28px; border-radius:12px; border:none;
+            font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;
+            display:flex; align-items:center; gap:8px; transition:transform 0.15s, opacity 0.15s;
         }
+        .crop-act-btn:active { transform:scale(0.96); opacity:0.8; }
+        .crop-act-btn.primary { background:var(--yellow); color:#000; }
+        .crop-act-btn.secondary { background:var(--card2); color:var(--text); }
 
-        .filter-thumb.active .filter-thumb-label {
-            color: var(--ios-blue);
-            font-weight: 600;
+        /* لوحة التدوير */
+        .rotate-btns { display:flex; justify-content:center; gap:30px; padding:16px 0; }
+        .rot-btn {
+            width:68px; height:68px; border-radius:50%; background:var(--card2);
+            border:none; color:var(--text); font-size:22px; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:transform 0.15s, background 0.2s;
         }
-
-        /* ===== أدوات التعديل - شكل آيفوني ===== */
-  /* تصميم شريط الأدوات الأفقي */
-/* حاوية الأدوات - تمرير أفقي */
-.edit-options {
-    display: flex;
-    overflow-x: auto;
-    gap: 20px; /* مسافة بين كل أداة وأخرى */
-    padding: 20px 15px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    justify-content: flex-start;
-    background: transparent;
-}
-
-.edit-options::-webkit-scrollbar {
-    display: none;
-}
-
-/* زر الأداة الواحد */
-.edit-opt {
-    flex: 0 0 75px; /* عرض ثابت لكل أداة لمنع تداخل الكلام */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    outline: none;
-}
-
-/* الدائرة السوداء للأيقونة */
-.edit-opt-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #151515; /* لون خلفية الأيقونة داكن جداً */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid #252525; /* إطار خفيف */
-}
-
-/* الحلقة الصفراء (تظهر عند التعديل أو الاختيار) */
-.edit-opt.active .edit-opt-icon {
-    border-color: #ffd60a; /* اللون الأصفر لآيفون */
-    background: #000;
-}
-
-/* إضافة حلقة داخلية عند وجود قيمة تعديل */
-.edit-opt.modified .edit-opt-icon::after {
-    content: '';
-    position: absolute;
-    top: -4px; left: -4px; right: -4px; bottom: -4px;
-    border: 2px solid #ffd60a;
-    border-radius: 50%;
-}
-
-/* تنسيق النص (الكلمات) */
-.edit-opt span {
-    font-size: 12px;
-    color: #8e8e93; /* لون رمادي للنصوص غير النشطة */
-    font-weight: 500;
-    white-space: nowrap; /* منع انقسام الكلمة لسطرين */
-    transition: color 0.2s;
-}
-
-.edit-opt.active span {
-    color: #ffffff; /* اللون الأبيض للكلمة المختارة */
-    font-weight: 600;
-}
-
-/* أيقونات SVG داخل الدوائر */
-.edit-opt-icon svg {
-    width: 26px;
-    height: 26px;
-    fill: none;
-    stroke: #ffffff;
-    stroke-width: 1.5;
-}
-        .edit-opt-icon.auto { background: rgba(255, 159, 10, 0.2); color: var(--ios-orange); }
-        .edit-opt-icon.exposure { background: rgba(10, 132, 255, 0.2); color: var(--ios-blue); }
-        .edit-opt-icon.brilliance { background: rgba(100, 210, 255, 0.2); color: var(--ios-teal); }
-        .edit-opt-icon.highlights { background: rgba(255, 214, 10, 0.2); color: var(--ios-yellow); }
-        .edit-opt-icon.shadows { background: rgba(191, 90, 242, 0.2); color: var(--ios-purple); }
-        .edit-opt-icon.contrast { background: rgba(255, 55, 95, 0.2); color: var(--ios-pink); }
-        .edit-opt-icon.brightness { background: rgba(255, 159, 10, 0.2); color: var(--ios-orange); }
-        .edit-opt-icon.blackpoint { background: rgba(142, 142, 147, 0.2); color: var(--ios-text2); }
-        .edit-opt-icon.saturation { background: rgba(48, 209, 88, 0.2); color: var(--ios-green); }
-        .edit-opt-icon.vibrance { background: rgba(255, 55, 95, 0.2); color: var(--ios-pink); }
-        .edit-opt-icon.warmth { background: rgba(255, 159, 10, 0.2); color: var(--ios-orange); }
-        .edit-opt-icon.tint { background: rgba(100, 210, 255, 0.2); color: var(--ios-teal); }
-        .edit-opt-icon.sharpness { background: rgba(10, 132, 255, 0.2); color: var(--ios-blue); }
-        .edit-opt-icon.definition { background: rgba(191, 90, 242, 0.2); color: var(--ios-purple); }
-        .edit-opt-icon.noise { background: rgba(142, 142, 147, 0.2); color: var(--ios-text2); }
-        .edit-opt-icon.vignette { background: rgba(255, 55, 95, 0.2); color: var(--ios-pink); }
-
-        /* ===== السلايدر الآيفوني ===== */
-        .ios-slider-section {
-            display: none;
-            padding-top: 8px;
-        }
-
-        .ios-slider-section.active {
-            display: block;
-        }
-
-        .ios-slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .ios-slider-title {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .ios-slider-reset {
-            font-size: 14px;
-            color: var(--ios-blue);
-            background: none;
-            border: none;
-            font-family: inherit;
-            cursor: pointer;
-        }
-
-        .ios-slider-track {
-            position: relative;
-            width: 100%;
-            height: 28px;
-            display: flex;
-            align-items: center;
-        }
-
-        .ios-slider-bg {
-            position: absolute;
-            left: 0; right: 0;
-            height: 4px;
-            border-radius: 2px;
-            background: var(--ios-card2);
-            overflow: hidden;
-        }
-
-        .ios-slider-fill {
-            height: 100%;
-            border-radius: 2px;
-            background: var(--ios-blue);
-            width: 50%;
-            transition: width 0.05s;
-        }
-
-        .ios-slider-fill.negative {
-            background: var(--ios-orange);
-        }
-
-        input[type="range"].ios-range {
-            -webkit-appearance: none;
-            appearance: none;
-            position: relative;
-            width: 100%;
-            height: 28px;
-            background: transparent;
-            z-index: 2;
-            cursor: pointer;
-        }
-
-        input[type="range"].ios-range::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.1);
-        }
-
-        .ios-slider-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 4px;
-        }
-
-        .ios-slider-labels span {
-            font-size: 12px;
-            color: var(--ios-text2);
-        }
-
-        /* ===== لوحة القص ===== */
-        .crop-ratios {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .crop-ratio-btn {
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: var(--ios-card2);
-            border: none;
-            color: var(--ios-text);
-            font-family: inherit;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .crop-ratio-btn.active {
-            background: var(--ios-blue);
-            color: #fff;
-        }
-
-        /* ===== لوحة التدوير ===== */
-        .rotate-controls {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            padding: 20px 0;
-        }
-
-        .rotate-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: var(--ios-card2);
-            border: none;
-            color: var(--ios-text);
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.15s, background 0.2s;
-        }
-
-        .rotate-btn:active {
-            transform: scale(0.9);
-            background: var(--ios-sep);
-        }
-
-        .rotate-slider-section {
-            padding: 10px 0 20px;
-        }
-
-        .flip-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding-top: 10px;
-        }
-
+        .rot-btn:active { transform:scale(0.9); background:var(--sep); }
+        .rotate-slider-area { padding:8px 24px 0; }
+        .flip-row { display:flex; justify-content:center; gap:16px; padding:20px 16px 0; }
         .flip-btn {
-            padding: 10px 24px;
-            border-radius: 12px;
-            background: var(--ios-card2);
-            border: none;
-            color: var(--ios-text);
-            font-family: inherit;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
+            padding:10px 22px; border-radius:12px; background:var(--card2);
+            border:none; color:var(--text); font-family:inherit; font-size:14px;
+            cursor:pointer; display:flex; align-items:center; gap:8px; transition:background 0.2s;
         }
+        .flip-btn:active { background:var(--sep); }
 
-        .flip-btn:active {
-            background: var(--ios-sep);
+        /* لوحة التلقائي */
+        .auto-content { text-align:center; padding:30px 20px; color:var(--text2); font-size:15px; line-height:1.7; }
+        .auto-btn {
+            margin-top:20px; padding:14px 40px; border-radius:50px;
+            background:linear-gradient(135deg, var(--orange), var(--pink));
+            color:#fff; font-size:17px; font-weight:600; border:none;
+            font-family:inherit; cursor:pointer; transition:transform 0.15s;
         }
+        .auto-btn:active { transform:scale(0.95); }
 
-        /* ===== مقارنة قبل/بعد ===== */
-        .compare-hint {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            padding: 10px 24px;
-            border-radius: 20px;
-            font-size: 15px;
-            font-weight: 600;
-            z-index: 90;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
+        /* إشعار */
+        .toast {
+            position:fixed; top:60px; left:50%; transform:translateX(-50%) translateY(-30px);
+            background:var(--card); border:1px solid var(--sep);
+            padding:12px 24px; border-radius:14px; font-size:15px; font-weight:500;
+            z-index:999; backdrop-filter:blur(20px); opacity:0;
+            transition:all 0.3s cubic-bezier(0.32,0.72,0,1); pointer-events:none;
         }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-        .compare-hint.show {
-            opacity: 1;
+        /* طبقة القص */
+        .crop-overlay {
+            position:fixed; inset:0; z-index:80; display:none; cursor:crosshair;
         }
+        .crop-overlay.show { display:block; }
 
-        /* ===== التبويب التلقائي ===== */
-        .auto-panel-content {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--ios-text2);
-            font-size: 15px;
-            line-height: 1.6;
+        @media(min-width:768px) {
+            .tool-panel { max-width:500px; left:50%; transform:translate(-50%,100%); border-bottom-left-radius:20px; border-bottom-right-radius:20px; }
+            .tool-panel.open { transform:translate(-50%,0); }
         }
-
-        .auto-magic-btn {
-            margin-top: 20px;
-            padding: 14px 36px;
-            border-radius: 50px;
-            background: linear-gradient(135deg, var(--ios-orange), var(--ios-pink));
-            color: #fff;
-            font-size: 17px;
-            font-weight: 600;
-            border: none;
-            font-family: inherit;
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-
-        .auto-magic-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* ===== إشعار آيفوني ===== */
-        .ios-toast {
-            position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-30px);
-            background: var(--ios-card);
-            border: 1px solid var(--ios-sep);
-            padding: 12px 24px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 500;
-            z-index: 999;
-            backdrop-filter: blur(20px);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-            pointer-events: none;
-        }
-
-        .ios-toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* ريسبونسيف */
-        @media (min-width: 768px) {
-            .tool-panel {
-                max-width: 500px;
-                left: 50%;
-                transform: translate(-50%, 100%);
-                border-bottom-left-radius: 20px;
-                border-bottom-right-radius: 20px;
-            }
-            .tool-panel.open {
-                transform: translate(-50%, 0);
-            }
-            .filters-scroll {
-                justify-content: center;
-                flex-wrap: nowrap;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+        @media(prefers-reduced-motion:reduce) {
+            *{ transition-duration:0.01ms!important; animation-duration:0.01ms!important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- شاشة الرفع -->
-    <div class="upload-screen" id="uploadScreen">
-        <div class="upload-icon-wrap">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="3"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <path d="M21 15l-5-5L5 21"/>
-            </svg>
+<!-- شاشة الرفع -->
+<div class="upload-screen" id="uploadScreen">
+    <div class="upload-icon">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+        </svg>
+    </div>
+    <div class="upload-title">الصور</div>
+    <div class="upload-sub">اختار صورة من جهازك<br>لتعديلها بأدوات احترافية</div>
+    <button class="upload-btn" id="uploadBtn">اختر صورة</button>
+    <div class="upload-hint">اسحب وأفلت أو اضغط للاختيار</div>
+    <input type="file" id="fileInput" accept="image/*" hidden>
+</div>
+
+<!-- منطقة السحب -->
+<div class="drop-zone" id="dropZone"><span>أسقط الصورة هنا</span></div>
+
+<!-- شريط علوي -->
+<div class="topbar" id="topbar">
+    <button class="btn-cancel" id="btnCancel">إلغاء</button>
+    <span class="top-title" id="topTitle">تعديل</span>
+    <button class="btn-done" id="btnDone">تم</button>
+</div>
+
+<!-- منطقة الصورة -->
+<div class="image-area"><canvas id="mainCanvas"></canvas></div>
+
+<!-- نصيحة المقارنة -->
+<div class="compare-badge" id="compareBadge">الأصل</div>
+
+<!-- طبقة القص -->
+<canvas class="crop-overlay" id="cropOverlay"></canvas>
+
+<!-- شريط التبويبات -->
+<div class="bottom-bar" id="bottomBar">
+    <div class="tabs">
+        <button class="tab-btn" data-tab="auto">
+            <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>
+            <span>تلقائي</span>
+        </button>
+        <button class="tab-btn" data-tab="adjust">
+            <svg viewBox="0 0 24 24"><path d="M3 17V19H9V17H3ZM3 5V7H13V5H3ZM13 21V19H21V17H13V15H11V21H13ZM7 9V11H3V13H7V15H9V9H7ZM21 13V11H11V13H21ZM15 9H17V7H21V5H17V3H15V9Z"/></svg>
+            <span>تعديل</span>
+        </button>
+        <button class="tab-btn" data-tab="filters">
+            <svg viewBox="0 0 24 24"><path d="M3 5H7L9 3H15L17 5H21V7H3V5ZM5 8H19V20C19 20.55 18.55 21 18 21H6C5.45 21 5 20.55 5 20V8ZM8 10V19H10V10H8ZM14 10V19H16V10H14Z"/></svg>
+            <span>فلاتر</span>
+        </button>
+        <button class="tab-btn" data-tab="crop">
+            <svg viewBox="0 0 24 24"><path d="M17 15H7V7H9V13H15V7H17V15ZM5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3ZM5 5V19H19V5H5Z"/></svg>
+            <span>قص</span>
+        </button>
+        <button class="tab-btn" data-tab="rotate">
+            <svg viewBox="0 0 24 24"><path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11H2.05C2.25 9.14 2.99 7.44 4.17 6.05L2.71 4.59L4.13 3.17L7.11 6.15V8.53ZM21.95 13H19.93C19.76 14.39 19.2 15.73 18.3 16.89L16.89 15.47V18.85L19.87 21.83L21.29 20.41L19.83 18.95C21.01 17.56 21.75 15.86 21.95 13ZM16 5H18V11H16V5ZM8 13H14V15H8V13Z"/></svg>
+            <span>تدوير</span>
+        </button>
+    </div>
+</div>
+
+<!-- لوحة التلقائي -->
+<div class="tool-panel" id="panelAuto">
+    <div class="panel-handle"></div>
+    <div class="panel-body">
+        <div class="auto-content">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="var(--orange)" style="margin-bottom:12px;opacity:0.7;"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>
+            <p>تحسين تلقائي للصورة<br>يضبط الإضاءة والألوان والتباين</p>
+            <button class="auto-btn" id="autoBtn">تحسين تلقائي</button>
         </div>
-        <div class="upload-title">الصور</div>
-        <div class="upload-subtitle">اختار صورة من جهازك<br>لتعديلها بأدوات احترافية</div>
-        <button class="ios-upload-btn" id="uploadBtn">اختر صورة</button>
-        <div class="upload-hint-small">اسحب وأفلت أو اضغط للاختيار</div>
-        <input type="file" id="fileInput" accept="image/*" hidden>
     </div>
+</div>
 
-    <!-- شريط علوي -->
-    <div class="ios-topbar" id="topBar">
-        <button class="ios-btn-cancel" id="btnCancel">إلغاء</button>
-        <span class="ios-top-title" id="topTitle">تعديل</span>
-        <button class="ios-btn-done" id="btnDone">تم</button>
+<!-- لوحة التعديل -->
+<div class="tool-panel" id="panelAdjust">
+    <div class="panel-handle"></div>
+    <div class="panel-body">
+        <div class="edit-tools-row" id="editToolsRow"></div>
+        <div class="slider-area" id="sliderArea"></div>
     </div>
+</div>
 
-    <!-- منطقة الصورة -->
-    <div class="image-area" id="imageArea">
-        <canvas id="mainCanvas"></canvas>
+<!-- لوحة الفلاتر -->
+<div class="tool-panel" id="panelFilters">
+    <div class="panel-handle"></div>
+    <div class="panel-body">
+        <div class="filters-row" id="filtersRow"></div>
     </div>
+</div>
 
-    <!-- نصيحة المقارنة -->
-    <div class="compare-hint" id="compareHint">الأصل</div>
-
-    <!-- شريط أدوات سفلي -->
-    <div class="ios-bottom-bar" id="bottomBar">
-        <div class="ios-tabs">
-            <button class="ios-tab active" data-tab="auto">
-                <svg viewBox="0 0 24 24"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>
-                <span>تلقائي</span>
-            </button>
-            <button class="ios-tab" data-tab="filters">
-                <svg viewBox="0 0 24 24"><path d="M3 5H7L9 3H15L17 5H21V7H3V5ZM5 8H19V20C19 20.55 18.55 21 18 21H6C5.45 21 5 20.55 5 20V8ZM8 10V19H10V10H8ZM14 10V19H16V10H14Z"/></svg>
-                <span>فلاتر</span>
-            </button>
-            <button class="ios-tab" data-tab="adjust">
-                <svg viewBox="0 0 24 24"><path d="M3 17V19H9V17H3ZM3 5V7H13V5H3ZM13 21V19H21V17H13V15H11V21H13ZM7 9V11H3V13H7V15H9V9H7ZM21 13V11H11V13H21ZM15 9H17V7H21V5H17V3H15V9Z"/></svg>
-                <span>تعديل</span>
-            </button>
-            <button class="ios-tab" data-tab="crop">
-                <svg viewBox="0 0 24 24"><path d="M17 15H7V7H9V13H15V7H17V15ZM5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3ZM5 5V19H19V5H5Z"/></svg>
-                <span>قص</span>
-            </button>
-            <button class="ios-tab" data-tab="rotate">
-                <svg viewBox="0 0 24 24"><path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11H2.05C2.25 9.14 2.99 7.44 4.17 6.05L2.71 4.59L4.13 3.17L7.11 6.15V8.53ZM21.95 13H19.93C19.76 14.39 19.2 15.73 18.3 16.89L16.89 15.47V18.85L19.87 21.83L21.29 20.41L19.83 18.95C21.01 17.56 21.75 15.86 21.95 13ZM16 5H18V11H16V5ZM8 13H14V15H8V13Z"/></svg>
-                <span>تدوير</span>
-            </button>
+<!-- لوحة القص -->
+<div class="tool-panel" id="panelCrop">
+    <div class="panel-handle"></div>
+    <div class="panel-body">
+        <div class="crop-ratios" id="cropRatios">
+            <button class="crop-r-btn active" data-ratio="free">حر</button>
+            <button class="crop-r-btn" data-ratio="1:1">1:1</button>
+            <button class="crop-r-btn" data-ratio="4:3">4:3</button>
+            <button class="crop-r-btn" data-ratio="3:4">3:4</button>
+            <button class="crop-r-btn" data-ratio="16:9">16:9</button>
+            <button class="crop-r-btn" data-ratio="9:16">9:16</button>
+        </div>
+        <p class="crop-hint">اختر نسبة القص ثم اضغط على الصورة واسحب لتحديد المنطقة</p>
+        <div class="crop-actions">
+            <button class="crop-act-btn primary" id="cropApplyBtn"><i class="fas fa-check"></i> تطبيق</button>
+            <button class="crop-act-btn secondary" id="cropCancelBtn"><i class="fas fa-times"></i> إلغاء</button>
         </div>
     </div>
+</div>
 
-    <!-- لوحة التلقائي -->
-    <div class="tool-panel" id="panelAuto">
-        <div class="panel-handle"></div>
-        <div class="panel-body">
-            <div class="auto-panel-content">
-                <div style="font-size:48px; margin-bottom:12px; opacity:0.5;">
-                    <svg width="56" height="56" viewBox="0 0 24 24" fill="var(--ios-orange)"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>
-                </div>
-                <p>تحسين تلقائي للصورة<br>يضبط الإضاءة والألوان والتباين</p>
-                <button class="auto-magic-btn" id="autoMagicBtn">تحسين تلقائي</button>
+<!-- لوحة التدوير -->
+<div class="tool-panel" id="panelRotate">
+    <div class="panel-handle"></div>
+    <div class="panel-body">
+        <div class="rotate-btns">
+            <button class="rot-btn" id="rotLeft" aria-label="تدوير يسار"><i class="fas fa-undo"></i></button>
+            <button class="rot-btn" id="rotRight" aria-label="تدوير يمين"><i class="fas fa-redo"></i></button>
+        </div>
+        <div class="rotate-slider-area">
+            <div class="slider-head">
+                <span>زاوية الدوران</span>
+                <button class="slider-reset" id="rotReset">إعادة تعيين</button>
             </div>
+            <div class="slider-track-wrap">
+                <div class="slider-track-bg"><div class="slider-track-fill" id="rotFill" style="width:50%"></div></div>
+                <input type="range" class="ios-slider" id="rotSlider" min="-180" max="180" value="0">
+            </div>
+            <div class="slider-labels"><span>-180°</span><span id="rotVal" class="slider-val-display" style="color:var(--blue)">0°</span><span>180°</span></div>
+        </div>
+        <div class="flip-row">
+            <button class="flip-btn" id="flipHBtn"><i class="fas fa-arrows-alt-h"></i> عكس أفقي</button>
+            <button class="flip-btn" id="flipVBtn"><i class="fas fa-arrows-alt-v"></i> عكس رأسي</button>
         </div>
     </div>
+</div>
 
-    <!-- لوحة الفلاتر -->
-    <div class="tool-panel" id="panelFilters">
-        <div class="panel-handle"></div>
-        <div class="filters-scroll" id="filtersScroll">
-            <!-- يتم ملؤها ديناميكيا -->
-        </div>
-    </div>
+<!-- إشعار -->
+<div class="toast" id="toast"></div>
 
-    <!-- لوحة التعديل -->
-    <div class="tool-panel" id="panelAdjust">
-        <div class="panel-handle"></div>
-        <div class="panel-header">
-            <span class="panel-title">تعديل</span>
-            <button class="panel-close" id="adjustClose"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="panel-body">
-            <div class="edit-options" id="editOptions">
-                <!-- يتم ملؤها ديناميكيا -->
-            </div>
-            <div id="sliderContainer"></div>
-        </div>
-    </div>
+<script>
+// ===== المتغيرات الأساسية =====
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const cropCanvas = document.getElementById('cropOverlay');
+const cropCtx = cropCanvas.getContext('2d');
+const fileInput = document.getElementById('fileInput');
 
-    <!-- لوحة القص -->
-    <div class="tool-panel" id="panelCrop">
-        <div class="panel-handle"></div>
-        <div class="panel-header">
-            <span class="panel-title">قص</span>
-            <button class="panel-close" id="cropClose"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="panel-body">
-            <div class="crop-ratios" id="cropRatios">
-                <button class="crop-ratio-btn active" data-ratio="free">حر</button>
-                <button class="crop-ratio-btn" data-ratio="1:1">1:1</button>
-                <button class="crop-ratio-btn" data-ratio="4:3">4:3</button>
-                <button class="crop-ratio-btn" data-ratio="3:4">3:4</button>
-                <button class="crop-ratio-btn" data-ratio="16:9">16:9</button>
-                <button class="crop-ratio-btn" data-ratio="9:16">9:16</button>
-            </div>
-            <p style="text-align:center; color:var(--ios-text2); font-size:14px; line-height:1.6;">
-                اختر نسبة القص ثم اضغط على الصورة واسحب لتحديد المنطقة
-            </p>
-            <div style="display:flex; justify-content:center; gap:12px; margin-top:20px;">
-                <button class="flip-btn" id="cropApply" style="background:var(--ios-blue); color:#fff;">
-                    <i class="fas fa-check"></i> تطبيق القص
-                </button>
-                <button class="flip-btn" id="cropCancelBtn">
-                    <i class="fas fa-times"></i> إلغاء
-                </button>
-            </div>
-        </div>
-    </div>
+let originalImage = null;      // الصورة الأصلية المحملة
+let workingImage = null;        // صورة العمل (بعد قص)
+let currentFilter = 'none';
+let flipH = false, flipV = false;
+let freeRotation = 0;
+let cropRatio = 'free';
+let isCropping = false;
+let cropStart = null, cropEnd = null;
+let appliedCrop = null;         // القص المطبق فعلياً
+let activeTool = null;
+let activePanel = null;
+let isComparing = false;
 
-    <!-- لوحة التدوير -->
-    <div class="tool-panel" id="panelRotate">
-        <div class="panel-handle"></div>
-        <div class="panel-header">
-            <span class="panel-title">تدوير</span>
-            <button class="panel-close" id="rotateClose"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="panel-body">
-            <div class="rotate-controls">
-                <button class="rotate-btn" id="rotLeft" aria-label="تدوير يسار">
-                    <i class="fas fa-undo"></i>
-                </button>
-                <button class="rotate-btn" id="rotRight" aria-label="تدوير يمين">
-                    <i class="fas fa-redo"></i>
-                </button>
-            </div>
-            <div class="rotate-slider-section">
-                <div class="ios-slider-header">
-                    <span class="ios-slider-title">زاوية الدوران</span>
-                    <button class="ios-slider-reset" id="rotReset">إعادة تعيين</button>
-                </div>
-                <div class="ios-slider-track">
-                    <div class="ios-slider-bg"><div class="ios-slider-fill" id="rotFill" style="width:50%"></div></div>
-                    <input type="range" class="ios-range" id="rotSlider" min="-180" max="180" value="0">
-                </div>
-                <div class="ios-slider-labels"><span>-180°</span><span>0°</span><span>180°</span></div>
-            </div>
-            <div class="flip-row">
-                <button class="flip-btn" id="flipHBtn"><i class="fas fa-arrows-alt-h"></i> عكس أفقي</button>
-                <button class="flip-btn" id="flipVBtn"><i class="fas fa-arrows-alt-v"></i> عكس رأسي</button>
-            </div>
-        </div>
-    </div>
+// حالة التعديلات
+let adj = {
+    auto:0, exposure:0, brilliance:0, highlights:0, shadows:0,
+    contrast:0, brightness:0, blackpoint:0, saturation:0,
+    vibrance:0, warmth:0, tint:0, sharpness:0,
+    definition:0, noise:0, vignette:0
+};
 
-    <!-- إشعار -->
-    <div class="ios-toast" id="iosToast"></div>
+// تعريفات الأدوات
+const tools = [
+    { id:'auto', label:'تلقائي', cls:'clr-auto',
+      icon:'<path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/>' },
+    { id:'exposure', label:'التعرض', cls:'clr-exposure', min:-100, max:100,
+      icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/>' },
+    { id:'brilliance', label:'البهاء', cls:'clr-brilliance', min:-100, max:100,
+      icon:'<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>' },
+    { id:'highlights', label:'الإضاءة', cls:'clr-highlights', min:-100, max:100,
+      icon:'<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>' },
+    { id:'shadows', label:'الظلال', cls:'clr-shadows', min:-100, max:100,
+      icon:'<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9z" opacity="0.4"/><path d="M12 3v18"/>' },
+    { id:'contrast', label:'التباين', cls:'clr-contrast', min:-100, max:100,
+      icon:'<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2v20z"/>' },
+    { id:'brightness', label:'السطوع', cls:'clr-brightness', min:-100, max:100,
+      icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/>' },
+    { id:'blackpoint', label:'النقطة السوداء', cls:'clr-blackpoint', min:-100, max:100,
+      icon:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="#fff"/>' },
+    { id:'saturation', label:'التشبع', cls:'clr-saturation', min:-100, max:100,
+      icon:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6a6 6 0 0 1 0 12 6 6 0 0 1 0-12z" fill="rgba(255,255,255,0.3)"/>' },
+    { id:'vibrance', label:'الحيوية', cls:'clr-vibrance', min:-100, max:100,
+      icon:'<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" opacity="0.3"/><path d="M12 2a10 10 0 0 1 0 20" fill="rgba(255,100,100,0.4)"/><path d="M12 2a10 10 0 0 0 0 20" fill="rgba(100,200,255,0.3)"/>' },
+    { id:'warmth', label:'الدفء', cls:'clr-warmth', min:-100, max:100,
+      icon:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" fill="none"/><path d="M12 2a5 5 0 0 1 0 20" fill="rgba(255,159,10,0.4)"/>' },
+    { id:'tint', label:'الصبغة', cls:'clr-tint', min:-100, max:100,
+      icon:'<circle cx="12" cy="12" r="10" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12" stroke="rgba(100,210,255,0.6)" stroke-width="3"/>' },
+    { id:'sharpness', label:'الوضوح', cls:'clr-sharpness', min:0, max:100,
+      icon:'<path d="M12 2l2.09 6.26L20.18 9.27l-5 4.87L16.36 21 12 17.77 7.64 21l1.18-6.86-5-4.87 6.09-1.01L12 2z"/>' },
+    { id:'definition', label:'التحديد', cls:'clr-definition', min:-100, max:100,
+      icon:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7" opacity="0.5"/><circle cx="12" cy="12" r="10" opacity="0.25"/>' },
+    { id:'noise', label:'التشويش', cls:'clr-noise', min:0, max:100,
+      icon:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="8" r="1" fill="#fff"/><circle cx="15" cy="10" r="1" fill="#fff"/><circle cx="10" cy="15" r="1" fill="#fff"/><circle cx="16" cy="16" r="1" fill="#fff"/>' },
+    { id:'vignette', label:'الحواف', cls:'clr-vignette', min:-100, max:100,
+      icon:'<rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="12" cy="12" r="6"/>' }
+];
 
-    <script>
-        // ===== المتغيرات =====
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        const fileInput = document.getElementById('fileInput');
+// الفلاتر
+const filters = [
+    { id:'none', label:'الأصلي', css:'' },
+    { id:'vivid', label:'حيوي', css:'saturate(160%) contrast(110%)' },
+    { id:'vividWarm', label:'حيوي دافئ', css:'saturate(150%) contrast(105%) sepia(15%)' },
+    { id:'vividCool', label:'حيوي بارد', css:'saturate(140%) contrast(105%) hue-rotate(15deg)' },
+    { id:'dramatic', label:'درامي', css:'contrast(140%) brightness(90%) saturate(80%)' },
+    { id:'dramaticWarm', label:'درامي دافئ', css:'contrast(135%) brightness(92%) sepia(20%)' },
+    { id:'dramaticCool', label:'درامي بارد', css:'contrast(135%) brightness(90%) hue-rotate(20deg) saturate(80%)' },
+    { id:'mono', label:'أبيض وأسود', css:'grayscale(100%)' },
+    { id:'silver', label:'فضي', css:'grayscale(80%) contrast(120%) brightness(110%)' },
+    { id:'noir', label:'نوار', css:'grayscale(100%) contrast(150%) brightness(85%)' },
+    { id:'fade', label:'باهت', css:'brightness(115%) contrast(85%) saturate(70%)' },
+    { id:'chrome', label:'كروم', css:'contrast(115%) saturate(90%) brightness(105%)' },
+    { id:'process', label:'معالجة', css:'contrast(120%) brightness(95%) saturate(70%) sepia(10%)' },
+    { id:'instant', label:'فوري', css:'contrast(110%) brightness(105%) saturate(85%) sepia(8%)' },
+    { id:'tonal', label:'درجي', css:'contrast(105%) brightness(105%) saturate(110%)' },
+    { id:'transfer', label:'نقل', css:'contrast(115%) brightness(95%) saturate(75%) sepia(15%)' },
+    { id:'monoWarm', label:'أحادي دافئ', css:'grayscale(90%) sepia(20%) contrast(110%)' },
+    { id:'monoCool', label:'أحادي بارد', css:'grayscale(90%) hue-rotate(180deg) contrast(110%)' },
+];
 
-        let originalImage = null;
-        let currentFilter = 'none';
-        let flipH = false, flipV = false;
-        let freeRotation = 0;
-        let cropRatio = 'free';
-        let isCropping = false;
-        let cropStart = null, cropEnd = null;
-        let cropRect = null;
+// ===== الإشعار =====
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+}
 
-        // حالة التعديلات
-        let adjustments = {
-            exposure: 0, brilliance: 0, highlights: 0, shadows: 0,
-            contrast: 0, brightness: 0, blackpoint: 0, saturation: 0,
-            vibrance: 0, warmth: 0, tint: 0, sharpness: 0,
-            definition: 0, noise: 0, vignette: 0
-        };
+// ===== بناء فلتر CSS من التعديلات =====
+function buildAdjustCSS() {
+    const a = adj;
+    let brightness = 100 + (a.brightness * 0.5) + (a.exposure * 0.5) + (a.brilliance * 0.2) + (a.highlights * 0.15) - (a.shadows * 0.1);
+    let contrast = 100 + (a.contrast * 0.4) + (a.definition * 0.2) + (a.brilliance * 0.15);
+    let saturate = 100 + (a.saturation * 0.8) + (a.vibrance * 0.4) + (a.brilliance * 0.2);
 
-        // إعدادات كل أداة تعديل
-        const editTools = [
-            { id: 'auto', label: 'تلقائي', icon: 'auto', fn: 'auto' },
-            { id: 'exposure', label: 'التعرض', icon: 'exposure', min: -100, max: 100 },
-            { id: 'brilliance', label: 'البهاء', icon: 'brilliance', min: -100, max: 100 },
-            { id: 'highlights', label: 'الإضاءة', icon: 'highlights', min: -100, max: 100 },
-            { id: 'shadows', label: 'الظلال', icon: 'shadows', min: -100, max: 100 },
-            { id: 'contrast', label: 'التباين', icon: 'contrast', min: -100, max: 100 },
-            { id: 'brightness', label: 'السطوع', icon: 'brightness', min: -100, max: 100 },
-            { id: 'blackpoint', label: 'النقطة السوداء', icon: 'blackpoint', min: -100, max: 100 },
-            { id: 'saturation', label: 'التشبع', icon: 'saturation', min: -100, max: 100 },
-            { id: 'vibrance', label: 'الحيوية', icon: 'vibrance', min: -100, max: 100 },
-            { id: 'warmth', label: 'الدفء', icon: 'warmth', min: -100, max: 100 },
-            { id: 'tint', label: 'الصبغة', icon: 'tint', min: -100, max: 100 },
-            { id: 'sharpness', label: 'الوضوح', icon: 'sharpness', min: 0, max: 100 },
-            { id: 'definition', label: 'التحديد', icon: 'definition', min: -100, max: 100 },
-            { id: 'noise', label: 'التشويش', icon: 'noise', min: 0, max: 100 },
-            { id: 'vignette', label: 'الحواف', icon: 'vignette', min: -100, max: 100 },
-        ];
+    brightness = Math.max(0, Math.min(250, brightness));
+    contrast = Math.max(0, Math.min(250, contrast));
+    saturate = Math.max(0, Math.min(300, saturate));
 
-        // الفلاتر
-        const filterList = [
-            { id: 'none', label: 'الأصلي', css: '' },
-            { id: 'vivid', label: 'حيوي', css: 'saturate(160%) contrast(110%)' },
-            { id: 'vividWarm', label: 'حيوي دافئ', css: 'saturate(150%) contrast(105%) sepia(15%)' },
-            { id: 'vividCool', label: 'حيوي بارد', css: 'saturate(140%) contrast(105%) hue-rotate(15deg)' },
-            { id: 'dramatic', label: 'درامي', css: 'contrast(140%) brightness(90%) saturate(80%)' },
-            { id: 'dramaticWarm', label: 'درامي دافئ', css: 'contrast(135%) brightness(92%) sepia(20%)' },
-            { id: 'dramaticCool', label: 'درامي بارد', css: 'contrast(135%) brightness(90%) hue-rotate(20deg) saturate(80%)' },
-            { id: 'mono', label: 'أبيض وأسود', css: 'grayscale(100%)' },
-            { id: 'silver', label: 'فضي', css: 'grayscale(80%) contrast(120%) brightness(110%)' },
-            { id: 'noir', label: 'نوار', css: 'grayscale(100%) contrast(150%) brightness(85%)' },
-            { id: 'fade', label: 'باهت', css: 'brightness(115%) contrast(85%) saturate(70%)' },
-            { id: 'chrome', label: 'كروم', css: 'contrast(115%) saturate(90%) brightness(105%)' },
-            { id: 'process', label: 'معالجة', css: 'contrast(120%) brightness(95%) saturate(70%) sepia(10%)' },
-            { id: 'instant', label: 'فوري', css: 'contrast(110%) brightness(105%) saturate(85%) sepia(8%)' },
-            { id: 'tonal', label: 'درجي', css: 'contrast(105%) brightness(105%) saturate(110%)' },
-            { id: 'transfer', label: 'نقل', css: 'contrast(115%) brightness(95%) saturate(75%) sepia(15%)' },
-            { id: 'monoTone', label: 'أحادي دافئ', css: 'grayscale(90%) sepia(20%) contrast(110%)' },
-            { id: 'monoCool', label: 'أحادي بارد', css: 'grayscale(90%) hue-rotate(180deg) contrast(110%)' },
-        ];
+    let hueShift = a.warmth * 0.15 + a.tint * 0.1;
+    let f = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%)`;
+    if (Math.abs(hueShift) > 0.5) f += ` hue-rotate(${hueShift}deg)`;
+    return f;
+}
 
-        let activeTool = null;
-        let activePanel = null;
-        let isComparing = false;
-        let historyStack = [];
-        const MAX_HISTORY = 30;
+function getFullFilter() {
+    const fObj = filters.find(f => f.id === currentFilter);
+    const adjF = buildAdjustCSS();
+    if (!fObj || !fObj.css) return adjF;
+    return fObj.css + ' ' + adjF;
+}
 
-        // ===== الإشعار =====
-        function showToast(msg) {
-            const t = document.getElementById('iosToast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2000);
+// ===== رسم الصورة الرئيسية =====
+function renderImage(useOriginal) {
+    const img = workingImage || originalImage;
+    if (!img) return;
+
+    const rot = freeRotation * Math.PI / 180;
+    const absC = Math.abs(Math.cos(rot));
+    const absS = Math.abs(Math.sin(rot));
+    let w = Math.ceil(img.width * absC + img.height * absS);
+    let h = Math.ceil(img.width * absS + img.height * absC);
+
+    canvas.width = w;
+    canvas.height = h;
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+
+    if (!useOriginal) ctx.filter = getFullFilter();
+
+    ctx.translate(w / 2, h / 2);
+    ctx.rotate(rot);
+    ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+    ctx.restore();
+
+    // فينيت
+    if (!useOriginal && adj.vignette !== 0) {
+        const str = Math.abs(adj.vignette) / 100;
+        const grad = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)*0.3, w/2, h/2, Math.max(w,h)*0.7);
+        if (adj.vignette < 0) {
+            grad.addColorStop(0, `rgba(255,255,255,${str * 0.5})`);
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+        } else {
+            grad.addColorStop(0, 'rgba(0,0,0,0)');
+            grad.addColorStop(1, `rgba(0,0,0,${str * 0.7})`);
         }
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+    }
+}
 
-        // ===== حفظ الحالة =====
-        function saveState() {
-            historyStack.push({
-                filter: currentFilter,
-                adj: { ...adjustments },
-                flipH, flipV,
-                freeRotation,
-                cropRect: cropRect ? { ...cropRect } : null
-            });
-            if (historyStack.length > MAX_HISTORY) historyStack.shift();
-        }
-
-        // ===== بناء فلتر CSS من التعديلات =====
-        function buildAdjustFilter() {
-            const a = adjustments;
-            // تحويل التعديلات لقيم CSS
-            let brightness = 100 + (a.brightness * 0.5) + (a.exposure * 0.5);
-            let contrast = 100 + (a.contrast * 0.4) + (a.definition * 0.2);
-            let saturate = 100 + (a.saturation * 0.8) + (a.vibrance * 0.4);
-            let highlights = a.highlights;
-            let shadows = a.shadows;
-            let warmth = a.warmth;
-            let tint = a.tint;
-            let brilliance = a.brilliance;
-
-            brightness += brilliance * 0.2;
-            contrast += brilliance * 0.15;
-            saturate += brilliance * 0.2;
-            brightness += highlights * 0.15;
-            brightness -= shadows * 0.1;
-
-            brightness = Math.max(0, Math.min(200, brightness));
-            contrast = Math.max(0, Math.min(200, contrast));
-            saturate = Math.max(0, Math.min(300, saturate));
-
-            let hueShift = warmth * 0.15 + tint * 0.1;
-
-            let f = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%)`;
-            if (Math.abs(hueShift) > 0.5) f += ` hue-rotate(${hueShift}deg)`;
-            return f;
-        }
-
-        function getFullFilter() {
-            const filterObj = filterList.find(f => f.id === currentFilter);
-            const adjustF = buildAdjustFilter();
-            if (!filterObj || !filterObj.css) return adjustF;
-            return filterObj.css + ' ' + adjustF;
-        }
-
-        // ===== رسم الصورة =====
-        function renderImage(useOriginal = false) {
-            if (!originalImage) return;
-            const img = originalImage;
-
-            const rot = freeRotation * Math.PI / 180;
-            const absC = Math.abs(Math.cos(rot));
-            const absS = Math.abs(Math.sin(rot));
-            let w = Math.ceil(img.width * absC + img.height * absS);
-            let h = Math.ceil(img.width * absS + img.height * absC);
-
-            canvas.width = w;
-            canvas.height = h;
-
-            ctx.clearRect(0, 0, w, h);
-            ctx.save();
-
-            if (!useOriginal) {
-                ctx.filter = getFullFilter();
-            }
-
-            ctx.translate(w / 2, h / 2);
-            ctx.rotate(rot);
-            ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
-            ctx.drawImage(img, -img.width / 2, -img.height / 2);
-            ctx.restore();
-
-            // فينيت
-            if (!useOriginal && adjustments.vignette !== 0) {
-                const strength = Math.abs(adjustments.vignette) / 100;
-                const gradient = ctx.createRadialGradient(w/2, h/2, Math.min(w,h) * 0.3, w/2, h/2, Math.max(w,h) * 0.7);
-                if (adjustments.vignette < 0) {
-                    gradient.addColorStop(0, `rgba(255,255,255,${strength * 0.5})`);
-                    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-                } else {
-                    gradient.addColorStop(0, 'rgba(0,0,0,0)');
-                    gradient.addColorStop(1, `rgba(0,0,0,${strength * 0.7})`);
-                }
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, w, h);
-            }
-
-            // رسم مستطيل القص
-            if (isCropping && cropStart && cropEnd) {
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([6, 4]);
-                const x = Math.min(cropStart.x, cropEnd.x);
-                const y = Math.min(cropStart.y, cropEnd.y);
-                const cw = Math.abs(cropEnd.x - cropStart.x);
-                const ch = Math.abs(cropEnd.y - cropStart.y);
-                ctx.strokeRect(x, y, cw, ch);
-                ctx.setLineDash([]);
-
-                // تأثير معتم خارج القص
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.fillRect(0, 0, w, y);
-                ctx.fillRect(0, y + ch, w, h - y - ch);
-                ctx.fillRect(0, y, x, ch);
-                ctx.fillRect(x + cw, y, w - x - cw, ch);
-            }
-        }
-
-        // ===== رفع الصورة =====
-        function loadImage(file) {
-            if (!file || !file.type.startsWith('image/')) {
-                showToast('اختر ملف صورة صالح');
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    originalImage = img;
-                    document.getElementById('uploadScreen').classList.add('hidden');
-                    document.getElementById('topBar').classList.add('visible');
-                    document.getElementById('bottomBar').classList.add('visible');
-                    resetAll(false);
-                    renderImage();
-                    saveState();
-                    showToast('تم تحميل الصورة');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', e => { if (e.target.files[0]) loadImage(e.target.files[0]); });
-
-        // سحب وإفلات
-        document.body.addEventListener('dragover', e => e.preventDefault());
-        document.body.addEventListener('drop', e => {
-            e.preventDefault();
-            if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
-        });
-
-        // ===== التبويبات =====
-        const panels = {
-            auto: document.getElementById('panelAuto'),
-            filters: document.getElementById('panelFilters'),
-            adjust: document.getElementById('panelAdjust'),
-            crop: document.getElementById('panelCrop'),
-            rotate: document.getElementById('panelRotate')
-        };
-
-        document.querySelectorAll('.ios-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                if (!originalImage) return;
-                const tabName = tab.dataset.tab;
-                document.querySelectorAll('.ios-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                // إغلاق كل اللوحات
-                Object.values(panels).forEach(p => p.classList.remove('open'));
-                activePanel = null;
-
-                if (tabName !== 'auto' || true) {
-                    panels[tabName].classList.add('open');
-                    activePanel = tabName;
-                }
-
-                // بناء معاينات الفلاتر
-                if (tabName === 'filters') buildFilterThumbs();
-            });
-        });
-
-        // إغلاق اللوحات
-        function closeAllPanels() {
-            Object.values(panels).forEach(p => p.classList.remove('open'));
-            activePanel = null;
-            document.querySelectorAll('.ios-tab').forEach(t => t.classList.remove('active'));
-            activeTool = null;
-            isCropping = false;
-            cropStart = null;
-            cropEnd = null;
+// ===== رفع الصورة =====
+function loadImage(file) {
+    if (!file || !file.type.startsWith('image/')) { showToast('اختر ملف صورة صالح'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            originalImage = img;
+            workingImage = img;
+            appliedCrop = null;
+            document.getElementById('uploadScreen').classList.add('hidden');
+            document.getElementById('topbar').classList.add('show');
+            document.getElementById('bottomBar').classList.add('show');
+            resetAll(false);
             renderImage();
-        }
+            showToast('تم تحميل الصورة');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 
-        document.querySelectorAll('.panel-close').forEach(btn => {
-            btn.addEventListener('click', closeAllPanels);
-        });
+document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadImage(e.target.files[0]); });
 
-        // ===== معاينات الفلاتر =====
-        function buildFilterThumbs() {
-            const container = document.getElementById('filtersScroll');
-            container.innerHTML = '';
-            if (!originalImage) return;
+// سحب وإفلات
+const dropZone = document.getElementById('dropZone');
+let dragCounter = 0;
+document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dropZone.classList.add('show'); });
+document.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter<=0){ dragCounter=0; dropZone.classList.remove('show'); } });
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+    e.preventDefault(); dragCounter=0; dropZone.classList.remove('show');
+    if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
+});
 
-            filterList.forEach(f => {
-                const thumb = document.createElement('div');
-                thumb.className = 'filter-thumb' + (f.id === currentFilter ? ' active' : '');
-                thumb.dataset.filter = f.id;
+// ===== إعادة تعيين =====
+function resetAll(showMsg) {
+    currentFilter = 'none';
+    flipH = false; flipV = false;
+    freeRotation = 0;
+    isCropping = false; cropStart = null; cropEnd = null;
+    activeTool = null;
+    Object.keys(adj).forEach(k => adj[k] = 0);
+    workingImage = originalImage;
+    appliedCrop = null;
+    document.getElementById('rotSlider').value = 0;
+    document.getElementById('rotFill').style.width = '50%';
+    document.getElementById('rotFill').classList.remove('neg');
+    document.getElementById('rotVal').textContent = '0°';
+    cropCanvas.classList.remove('show');
+    updateModifiedStates();
+    renderImage();
+    if (showMsg) showToast('تم إعادة التعيين');
+}
 
-                const imgWrap = document.createElement('div');
-                imgWrap.className = 'filter-thumb-img';
+// ===== التبويبات =====
+const panelMap = {
+    auto: document.getElementById('panelAuto'),
+    adjust: document.getElementById('panelAdjust'),
+    filters: document.getElementById('panelFilters'),
+    crop: document.getElementById('panelCrop'),
+    rotate: document.getElementById('panelRotate')
+};
 
-                const c = document.createElement('canvas');
-                const size = 90;
-                c.width = size;
-                c.height = size;
-                const tctx = c.getContext('2d');
+document.querySelectorAll('.tab-btn').forEach(tab => {
+    tab.addEventListener('click', () => {
+        if (!originalImage) return;
+        const name = tab.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
 
-                // قص الصورة لمربع
-                const img = originalImage;
-                const minDim = Math.min(img.width, img.height);
-                const sx = (img.width - minDim) / 2;
-                const sy = (img.height - minDim) / 2;
+        // إغلاق كل اللوحات
+        Object.values(panelMap).forEach(p => p.classList.remove('open'));
 
-                if (f.css) tctx.filter = f.css;
-                tctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+        // إلغاء القص لو مفيش قص
+        if (name !== 'crop') { isCropping = false; cropStart = null; cropEnd = null; cropCanvas.classList.remove('show'); renderImage(); }
 
-                imgWrap.appendChild(c);
-                const label = document.createElement('span');
-                label.className = 'filter-thumb-label';
-                label.textContent = f.label;
+        panelMap[name].classList.add('open');
+        activePanel = name;
 
-                thumb.appendChild(imgWrap);
-                thumb.appendChild(label);
+        if (name === 'filters') buildFilterThumbs();
+        if (name === 'adjust') { buildEditTools(); }
+    });
+});
 
-                thumb.addEventListener('click', () => {
-                    saveState();
-                    currentFilter = f.id;
-                    document.querySelectorAll('.filter-thumb').forEach(t => t.classList.remove('active'));
-                    thumb.classList.add('active');
-                    renderImage();
-                });
-
-                container.appendChild(thumb);
-            });
-        }
-
-        // ===== أدوات التعديل =====
-   function buildEditOptions() {
-    const container = document.getElementById('editOptions');
-    container.innerHTML = '';
-    
-    editTools.forEach(tool => {
+// ===== بناء أدوات التعديل الدائرية =====
+function buildEditTools() {
+    const row = document.getElementById('editToolsRow');
+    row.innerHTML = '';
+    tools.forEach(tool => {
         const btn = document.createElement('button');
-        btn.className = 'edit-opt';
-        btn.id = `opt-${tool.id}`;
-        
-        // الأيقونة (استبدلت بـ SVG مبسط ليشبه الآيفون)
-        btn.innerHTML = `
-            <div class="edit-opt-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-                    ${getIconPath(tool.id)}
-                </svg>
-            </div>
-            <span>${tool.label}</span>
-        `;
-        
+        btn.className = 'edit-circle' + (adj[tool.id] !== 0 ? ' modified' : '');
+        btn.id = 'ec-' + tool.id;
+        btn.innerHTML = `<div class="circle-icon ${tool.cls}"><svg viewBox="0 0 24 24">${tool.icon}</svg></div><span>${tool.label}</span>`;
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.edit-opt').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.edit-circle').forEach(e => e.classList.remove('active'));
             btn.classList.add('active');
             activeTool = tool.id;
-            showDialSlider(tool);
+            if (tool.id === 'auto') {
+                applyAutoEnhance();
+            } else {
+                showSlider(tool);
+            }
         });
-        container.appendChild(btn);
+        row.appendChild(btn);
     });
-
-    // تفعيل أول أداة تلقائياً
-    if(editTools.length > 0) document.querySelector('.edit-opt').click();
 }
 
-// وظيفة لعرض منزلق "البكرة"
-function showDialSlider(tool) {
-    const container = document.getElementById('sliderContainer');
-    const currentVal = adjustments[tool.id] || 0;
+// تحديث حالة modified
+function updateModifiedStates() {
+    tools.forEach(t => {
+        const el = document.getElementById('ec-' + t.id);
+        if (el) { el.classList.toggle('modified', adj[t.id] !== 0); }
+    });
+}
 
-    container.innerHTML = `
-        <div class="dial-container">
-            <div class="dial-cursor"></div>
-            <div class="dial-ticks" id="dialTicks"></div>
-            <input type="range" class="ios-range-dial" id="dialInput" 
-                   min="${tool.min || -100}" max="${tool.max || 100}" value="${currentVal}">
+// ===== عرض السلايدر =====
+function showSlider(tool) {
+    const area = document.getElementById('sliderArea');
+    const val = adj[tool.id] || 0;
+    const min = tool.min !== undefined ? tool.min : -100;
+    const max = tool.max !== undefined ? tool.max : 100;
+    const pct = ((val - min) / (max - min)) * 100;
+    const isNeg = val < (min < 0 ? 0 : min);
+
+    area.innerHTML = `
+        <div class="slider-head">
+            <span>${tool.label}</span>
+            <button class="slider-reset" id="sReset">إعادة تعيين</button>
         </div>
-        <div style="text-align:center; color:var(--ios-yellow); font-weight:bold; margin-top:-10px;">
-            ${currentVal !== 0 ? currentVal : ''}
+        <div class="slider-track-wrap">
+            <div class="slider-track-bg"><div class="slider-track-fill ${isNeg?'neg':''}" id="sFill" style="width:${pct}%"></div></div>
+            <input type="range" class="ios-slider" id="sSlider" min="${min}" max="${max}" value="${val}" step="1">
+        </div>
+        <div class="slider-labels">
+            <span>${min}</span>
+            <span id="sVal" class="slider-val-display" style="color:${isNeg?'var(--orange)':'var(--blue)'}">${val}</span>
+            <span>${max}</span>
         </div>
     `;
+    area.classList.add('show');
 
-    const ticksSub = document.getElementById('dialTicks');
-    // إنشاء 50 شرطة للبكرة
-    for(let i=0; i<60; i++) {
-        const tick = document.createElement('div');
-        tick.className = i % 5 === 0 ? 'tick major' : 'tick';
-        ticksSub.appendChild(tick);
+    const slider = document.getElementById('sSlider');
+    const fill = document.getElementById('sFill');
+    const valDisp = document.getElementById('sVal');
+
+    slider.addEventListener('input', () => {
+        const v = parseInt(slider.value);
+        adj[tool.id] = v;
+        const p = ((v - min) / (max - min)) * 100;
+        fill.style.width = p + '%';
+        const neg = v < (min < 0 ? 0 : min);
+        fill.classList.toggle('neg', neg);
+        valDisp.textContent = v;
+        valDisp.style.color = neg ? 'var(--orange)' : 'var(--blue)';
+        updateModifiedStates();
+        renderImage();
+    });
+    slider.addEventListener('change', () => {});
+
+    document.getElementById('sReset').addEventListener('click', () => {
+        adj[tool.id] = 0;
+        slider.value = 0;
+        const p = ((0 - min) / (max - min)) * 100;
+        fill.style.width = p + '%';
+        fill.classList.remove('neg');
+        valDisp.textContent = '0';
+        valDisp.style.color = 'var(--blue)';
+        updateModifiedStates();
+        renderImage();
+    });
+}
+
+// ===== التحسين التلقائي =====
+function applyAutoEnhance() {
+    adj.exposure = 10; adj.brilliance = 15; adj.highlights = -10;
+    adj.shadows = 20; adj.contrast = 10; adj.saturation = 10;
+    adj.vibrance = 15; adj.warmth = 5;
+    updateModifiedStates();
+    renderImage();
+    showToast('تم التحسين التلقائي');
+
+    // تحديث السلايدر لو مفتوح
+    if (activeTool && activeTool !== 'auto') {
+        const tool = tools.find(t => t.id === activeTool);
+        if (tool) showSlider(tool);
+    }
+}
+
+document.getElementById('autoBtn').addEventListener('click', () => {
+    applyAutoEnhance();
+});
+
+// ===== معاينات الفلاتر =====
+function buildFilterThumbs() {
+    const row = document.getElementById('filtersRow');
+    row.innerHTML = '';
+    if (!originalImage) return;
+    const img = workingImage || originalImage;
+    const minD = Math.min(img.width, img.height);
+    const sx = (img.width - minD) / 2;
+    const sy = (img.height - minD) / 2;
+
+    filters.forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'filter-item' + (f.id === currentFilter ? ' active' : '');
+
+        const wrap = document.createElement('div');
+        wrap.className = 'filter-img-wrap';
+        const c = document.createElement('canvas');
+        c.width = 88; c.height = 88;
+        const tctx = c.getContext('2d');
+        if (f.css) tctx.filter = f.css;
+        tctx.drawImage(img, sx, sy, minD, minD, 0, 0, 88, 88);
+        wrap.appendChild(c);
+
+        const label = document.createElement('span');
+        label.textContent = f.label;
+
+        item.appendChild(wrap);
+        item.appendChild(label);
+
+        item.addEventListener('click', () => {
+            currentFilter = f.id;
+            document.querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            renderImage();
+        });
+
+        row.appendChild(item);
+    });
+}
+
+// ===== القص =====
+document.querySelectorAll('.crop-r-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.crop-r-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        cropRatio = btn.dataset.ratio;
+        isCropping = false; cropStart = null; cropEnd = null;
+        cropCanvas.classList.remove('show');
+        renderImage();
+    });
+});
+
+// رسم القص على طبقة منفصلة
+function drawCropOverlay() {
+    if (!isCropping || !cropStart || !cropEnd) return;
+    const rect = canvas.getBoundingClientRect();
+    cropCanvas.width = rect.width;
+    cropCanvas.height = rect.height;
+    cropCanvas.style.width = rect.width + 'px';
+    cropCanvas.style.height = rect.height + 'px';
+    cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    let x1 = Math.min(cropStart.x, cropEnd.x);
+    let y1 = Math.min(cropStart.y, cropEnd.y);
+    let x2 = Math.max(cropStart.x, cropEnd.x);
+    let y2 = Math.max(cropStart.y, cropEnd.y);
+
+    // تطبيق نسبة القص
+    if (cropRatio !== 'free') {
+        const [rw, rh] = cropRatio.split(':').map(Number);
+        const ratio = rw / rh;
+        const cw = x2 - x1;
+        const ch = y2 - y1;
+        if (cw / ch > ratio) {
+            const newW = ch * ratio;
+            x2 = x1 + newW;
+        } else {
+            const newH = cw / ratio;
+            y2 = y1 + newH;
+        }
     }
 
-    const input = document.getElementById('dialInput');
-    input.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
-        adjustments[tool.id] = val;
-        
-        // تحريك البكرة بصرياً
-        const offset = val * 0.5; // نسبة التحريك
-        ticksSub.style.transform = `translateX(${-offset}px)`;
-        
+    // منطقة معتمة
+    cropCtx.fillStyle = 'rgba(0,0,0,0.5)';
+    cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
+    cropCtx.clearRect(x1, y1, x2-x1, y2-y1);
+
+    // إطار
+    cropCtx.strokeStyle = '#fff';
+    cropCtx.lineWidth = 1.5;
+    cropCtx.setLineDash([6, 4]);
+    cropCtx.strokeRect(x1, y1, x2-x1, y2-y1);
+    cropCtx.setLineDash([]);
+
+    // خطوط الأthirds
+    cropCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+    cropCtx.lineWidth = 0.5;
+    const tw = (x2-x1)/3, th = (y2-y1)/3;
+    for (let i=1; i<3; i++) {
+        cropCtx.beginPath(); cropCtx.moveTo(x1+tw*i, y1); cropCtx.lineTo(x1+tw*i, y2); cropCtx.stroke();
+        cropCtx.beginPath(); cropCtx.moveTo(x1, y1+th*i); cropCtx.lineTo(x2, y1+th*i); cropCtx.stroke();
+    }
+}
+
+// أحداث القص على طبقة منفصلة
+cropCanvas.addEventListener('touchstart', handleCropStart, {passive:false});
+cropCanvas.addEventListener('touchmove', handleCropMove, {passive:false});
+cropCanvas.addEventListener('touchend', handleCropEnd);
+cropCanvas.addEventListener('mousedown', handleCropStart);
+cropCanvas.addEventListener('mousemove', handleCropMove);
+cropCanvas.addEventListener('mouseup', handleCropEnd);
+
+function getCropPos(e) {
+    const rect = cropCanvas.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+function handleCropStart(e) {
+    e.preventDefault();
+    isCropping = true;
+    cropStart = getCropPos(e);
+    cropEnd = { ...cropStart };
+}
+
+function handleCropMove(e) {
+    if (!isCropping) return;
+    e.preventDefault();
+    cropEnd = getCropPos(e);
+    drawCropOverlay();
+}
+
+function handleCropEnd(e) {
+    if (!isCropping) return;
+    isCropping = false;
+    drawCropOverlay();
+}
+
+// تفعيل القص بالضغط على الصورة (لما لوحة القص مفتوحة)
+document.getElementById('imageArea').addEventListener('click', (e) => {
+    if (activePanel === 'crop' && !isCropping) {
+        cropCanvas.classList.add('show');
+        cropStart = null; cropEnd = null;
+        isCropping = false;
+        showToast('اسحب على الصورة لتحديد منطقة القص');
+    }
+});
+
+// تطبيق القص
+document.getElementById('cropApplyBtn').addEventListener('click', () => {
+    if (!cropStart || !cropEnd) { showToast('اسحب على الصورة أولاً لتحديد منطقة القص'); return; }
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    let x1 = Math.min(cropStart.x, cropEnd.x) * scaleX;
+    let y1 = Math.min(cropStart.y, cropEnd.y) * scaleY;
+    let x2 = Math.max(cropStart.x, cropEnd.x) * scaleX;
+    let y2 = Math.max(cropStart.y, cropEnd.y) * scaleY;
+
+    if (cropRatio !== 'free') {
+        const [rw, rh] = cropRatio.split(':').map(Number);
+        const ratio = rw / rh;
+        const cw = x2 - x1;
+        const ch = y2 - y1;
+        if (cw / ch > ratio) { const nw = ch * ratio; x2 = x1 + nw; }
+        else { const nh = cw / ratio; y2 = y1 + nh; }
+    }
+
+    x1 = Math.max(0, Math.round(x1));
+    y1 = Math.max(0, Math.round(y1));
+    x2 = Math.min(canvas.width, Math.round(x2));
+    y2 = Math.min(canvas.height, Math.round(y2));
+
+    const cw = x2 - x1;
+    const ch = y2 - y1;
+    if (cw < 10 || ch < 10) { showToast('منطقة القص صغيرة جداً'); return; }
+
+    // رسم الصورة بدون فلاتر على كانفاس مؤقت
+    const img = workingImage || originalImage;
+    const rot = freeRotation * Math.PI / 180;
+    const absC = Math.abs(Math.cos(rot));
+    const absS = Math.abs(Math.sin(rot));
+    let fw = Math.ceil(img.width * absC + img.height * absS);
+    let fh = Math.ceil(img.width * absS + img.height * absC);
+
+    const tmpC = document.createElement('canvas');
+    tmpC.width = fw; tmpC.height = fh;
+    const tmpCtx = tmpC.getContext('2d');
+    tmpCtx.translate(fw/2, fh/2);
+    tmpCtx.rotate(rot);
+    tmpCtx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+    tmpCtx.drawImage(img, -img.width/2, -img.height/2);
+
+    // قص المنطقة
+    const cropped = document.createElement('canvas');
+    cropped.width = cw; cropped.height = ch;
+    const crCtx = cropped.getContext('2d');
+    crCtx.drawImage(tmpC, x1, y1, cw, ch, 0, 0, cw, ch);
+
+    // إنشاء صورة جديدة
+    const newImg = new Image();
+    newImg.onload = function() {
+        workingImage = newImg;
+        appliedCrop = { x: x1, y: y1, w: cw, h: ch };
+        freeRotation = 0;
+        flipH = false; flipV = false;
+        document.getElementById('rotSlider').value = 0;
+        document.getElementById('rotFill').style.width = '50%';
+        document.getElementById('rotVal').textContent = '0°';
+        cropStart = null; cropEnd = null;
+        cropCanvas.classList.remove('show');
         renderImage();
-        // تحديث الرقم الظاهر
-        e.target.parentElement.nextElementSibling.textContent = val !== 0 ? val : '';
-    });
-    
-    input.addEventListener('change', () => saveState());
-}
-
-// أيقونات مبسطة تشبه iOS
-function getIconPath(id) {
-    const icons = {
-        auto: '<path d="M12 2L9 9l-7 3 7 3 3 7 3-7 7-3-7-3-3-7z"/>',
-        exposure: '<circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/>',
-        brightness: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
-        contrast: '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2v20z"/>',
-        saturation: '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2s-10 4.477-10 10 4.477 10 10 10z"/><path d="M12 18a6 6 0 100-12 6 6 0 000 12z"/>',
+        showToast('تم تطبيق القص');
     };
-    return icons[id] || '<circle cx="12" cy="12" r="10"/>';
+    newImg.src = cropped.toDataURL();
+});
+
+document.getElementById('cropCancelBtn').addEventListener('click', () => {
+    isCropping = false; cropStart = null; cropEnd = null;
+    cropCanvas.classList.remove('show');
+    renderImage();
+});
+
+// ===== التدوير =====
+document.getElementById('rotLeft').addEventListener('click', () => {
+    freeRotation = (freeRotation - 90 + 360) % 360;
+    if (freeRotation > 180) freeRotation -= 360;
+    updateRotSlider();
+    renderImage();
+});
+
+document.getElementById('rotRight').addEventListener('click', () => {
+    freeRotation = (freeRotation + 90) % 360;
+    if (freeRotation > 180) freeRotation -= 360;
+    updateRotSlider();
+    renderImage();
+});
+
+function updateRotSlider() {
+    const s = document.getElementById('rotSlider');
+    s.value = freeRotation;
+    const pct = ((freeRotation + 180) / 360) * 100;
+    document.getElementById('rotFill').style.width = pct + '%';
+    document.getElementById('rotFill').classList.toggle('neg', freeRotation < 0);
+    document.getElementById('rotVal').textContent = freeRotation + '°';
+    document.getElementById('rotVal').style.color = freeRotation < 0 ? 'var(--orange)' : 'var(--blue)';
 }
-        buildEditOptions();
 
-        // ===== عرض السلايدر =====
-        function showSlider(tool) {
-            const container = document.getElementById('sliderContainer');
-            const val = adjustments[tool.id] || 0;
-            const pct = ((val - tool.min) / (tool.max - tool.min)) * 100;
-            const isNeg = val < 0;
+document.getElementById('rotSlider').addEventListener('input', (e) => {
+    freeRotation = parseInt(e.target.value);
+    updateRotSlider();
+    renderImage();
+});
 
-            container.innerHTML = `
-                <div class="ios-slider-section active">
-                    <div class="ios-slider-header">
-                        <span class="ios-slider-title">${tool.label}</span>
-                        <button class="ios-slider-reset" id="sliderReset">إعادة تعيين</button>
-                    </div>
-                    <div class="ios-slider-track">
-                        <div class="ios-slider-bg">
-                            <div class="ios-slider-fill ${isNeg ? 'negative' : ''}" id="sliderFill" style="width:${pct}%"></div>
-                        </div>
-                        <input type="range" class="ios-range" id="activeSlider" min="${tool.min}" max="${tool.max}" value="${val}" step="1">
-                    </div>
-                    <div class="ios-slider-labels">
-                        <span>${tool.min}</span>
-                        <span id="sliderVal" style="color:${isNeg ? 'var(--ios-orange)' : 'var(--ios-blue)'}; font-weight:600;">${val}</span>
-                        <span>${tool.max}</span>
-                    </div>
-                </div>
-            `;
+document.getElementById('rotReset').addEventListener('click', () => {
+    freeRotation = 0;
+    updateRotSlider();
+    renderImage();
+});
 
-            const slider = document.getElementById('activeSlider');
-            const fill = document.getElementById('sliderFill');
-            const valDisplay = document.getElementById('sliderVal');
+document.getElementById('flipHBtn').addEventListener('click', () => { flipH = !flipH; renderImage(); showToast(flipH ? 'عكس أفقي' : 'إلغاء العكس الأفقي'); });
+document.getElementById('flipVBtn').addEventListener('click', () => { flipV = !flipV; renderImage(); showToast(flipV ? 'عكس رأسي' : 'إلغاء العكس الرأسي'); });
 
-            slider.addEventListener('input', () => {
-                const v = parseInt(slider.value);
-                adjustments[tool.id] = v;
-                const p = ((v - tool.min) / (tool.max - tool.min)) * 100;
-                fill.style.width = p + '%';
-                fill.className = 'ios-slider-fill' + (v < 0 ? ' negative' : '');
-                valDisplay.textContent = v;
-                valDisplay.style.color = v < 0 ? 'var(--ios-orange)' : 'var(--ios-blue)';
-                renderImage();
-            });
+// ===== قبل/بعد (بالضغط المطول على الصورة) =====
+let compareTimer = null;
+canvas.addEventListener('pointerdown', (e) => {
+    if (activePanel) return;
+    compareTimer = setTimeout(() => {
+        isComparing = true;
+        document.getElementById('compareBadge').classList.add('show');
+        renderImage(true);
+    }, 400);
+});
+canvas.addEventListener('pointerup', () => {
+    clearTimeout(compareTimer);
+    if (isComparing) {
+        isComparing = false;
+        document.getElementById('compareBadge').classList.remove('show');
+        renderImage();
+    }
+});
+canvas.addEventListener('pointerleave', () => {
+    clearTimeout(compareTimer);
+    if (isComparing) {
+        isComparing = false;
+        document.getElementById('compareBadge').classList.remove('show');
+        renderImage();
+    }
+});
 
-            slider.addEventListener('change', () => saveState());
+// ===== زر إلغاء =====
+document.getElementById('btnCancel').addEventListener('click', () => {
+    closeAllPanels();
+    resetAll(true);
+    originalImage = null;
+    workingImage = null;
+    document.getElementById('uploadScreen').classList.remove('hidden');
+    document.getElementById('topbar').classList.remove('show');
+    document.getElementById('bottomBar').classList.remove('show');
+    fileInput.value = '';
+});
 
-            document.getElementById('sliderReset').addEventListener('click', () => {
-                adjustments[tool.id] = 0;
-                slider.value = 0;
-                fill.style.width = '50%';
-                fill.className = 'ios-slider-fill';
-                valDisplay.textContent = '0';
-                valDisplay.style.color = 'var(--ios-blue)';
-                renderImage();
-                saveState();
-            });
+// ===== زر تم (حفظ/تحميل) =====
+document.getElementById('btnDone').addEventListener('click', () => {
+    if (!originalImage) return;
+    // رسم النسخة النهائية
+    renderImage(false);
+    const link = document.createElement('a');
+    link.download = 'edited_photo.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('تم حفظ الصورة');
+});
+
+// ===== إغلاق اللوحات =====
+function closeAllPanels() {
+    Object.values(panelMap).forEach(p => p.classList.remove('open'));
+    activePanel = null;
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    activeTool = null;
+    isCropping = false; cropStart = null; cropEnd = null;
+    cropCanvas.classList.remove('show');
+    document.getElementById('sliderArea').classList.remove('show');
+    renderImage();
+}
+
+// إغلاق اللوحة بالضغط على Handle
+document.querySelectorAll('.panel-handle').forEach(handle => {
+    handle.addEventListener('click', () => closeAllPanels());
+    handle.style.cursor = 'pointer';
+});
+
+// ===== إغلاق اللوحة بالسحب للأسفل =====
+document.querySelectorAll('.tool-panel').forEach(panel => {
+    let startY = 0, startTransform = 0;
+    const handle = panel.querySelector('.panel-handle');
+
+    function onStart(e) {
+        const touch = e.touches ? e.touches[0] : e;
+        startY = touch.clientY;
+        startTransform = panel.classList.contains('open') ? 0 : panel.offsetHeight;
+        panel.style.transition = 'none';
+    }
+
+    function onMove(e) {
+        const touch = e.touches ? e.touches[0] : e;
+        const dy = touch.clientY - startY;
+        if (dy > 0 && panel.classList.contains('open')) {
+            panel.style.transform = `translateY(${dy}px)`;
         }
+    }
 
-        // ===== التحسين التلقائي =====
-        function applyAutoEnhance() {
-            adjustments.exposure = 10;
-            adjustments.brilliance = 15;
-            adjustments.highlights = -10;
-            adjustments.shadows = 20;
-            adjustments.contrast = 10;
-            adjustments.saturation = 10;
-            adjustments.vibrance = 15;
-            adjustments.warmth = 5;
-            renderImage();
-            showToast('تم التحسين التلقائي');
-        }
-
-        document.getElementById('autoMagicBtn').addEventListener('click', () => {
-            if (!originalImage) return;
-            saveState();
-            applyAutoEnhance();
-        });
-
-        // ===== التدوير =====
-        document.getElementById('rotLeft').addEventListener('click', () => {
-            if (!originalImage) return;
-            saveState();
-            freeRotation -= 90;
-            if (freeRotation < -180) freeRotation += 360;
-            document.getElementById('rotSlider').value = freeRotation;
-            updateRotFill();
-            renderImage();
-        });
-
-        document.getElementById('rotRight').addEventListener('click', () => {
-            if (!originalImage) return;
-            saveState();
-            freeRotation += 90;
-            if (freeRotation > 180) freeRotation -= 360;
-            document.getElementById('rotSlider').value = freeRotation;
-            updateRotFill();
-            renderImage();
-        });
-
-        function updateRotFill() {
-            const v = parseInt(document.getElementById('rotSlider').value);
-            const pct = ((v + 180) / 360) * 100;
-            document.getElementById('rotFill').style.width = pct + '%';
-        }
-
-        document.getElementById('rotSlider').addEventListener('input', () => {
-            freeRotation = parseInt(document.getElementById('rotSlider').value);
-            updateRotFill();
-            renderImage();
-        });
-
-        document.getElementById('rotSlider').addEventListener('change', () => saveState());
-
-        document.getElementById('rotReset').addEventListener('click', () => {
-            freeRotation = 0;
-            document.getElementById('rotSlider').value = 0;
-            updateRotFill();
-            renderImage();
-            saveState();
-        });
-
-        document.getElementById('flipHBtn').addEventListener('click', () => {
-            if (!originalImage) return;
-            saveState();
-            flipH = !flipH;
-            renderImage();
-        });
-
-        document.getElementById('flipVBtn').addEventListener('click', () => {
-            if (!originalImage) return;
-            saveState();
-            flipV = !flipV;
-            renderImage();
-        });
-
-        // ===== القص =====
-        document.querySelectorAll('.crop-ratio-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.crop-ratio-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                cropRatio = btn.dataset.ratio;
-            });
-        });
-
-        // سحب القص على الكانفاس
-        canvas.addEventListener('mousedown', startCrop);
-        canvas.addEventListener('mousemove', moveCrop);
-        canvas.addEventListener('mouseup', endCrop);
-        canvas.addEventListener('touchstart', e => { e.preventDefault(); startCrop(e.touches[0]); }, { passive: false });
-        canvas.addEventListener('touchmove', e => { e.preventDefault(); moveCrop(e.touches[0]); }, { passive: false });
-        canvas.addEventListener('touchend', endCrop);
-
-        function getCanvasPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            return {
-                x: (e.clientX - rect.left) * (canvas.width / rect.width),
-                y: (e.clientY - rect.top) * (canvas.height / rect.height)
-            };
-        }
-
-        function startCrop(e) {
-            if (!isCropping || !originalImage) return;
-            cropStart = getCanvasPos(e);
-            cropEnd = null;
-        }
-
-        function moveCrop(e) {
-            if (!isCropping || !cropStart) return;
-            cropEnd = getCanvasPos(e);
-
-            // تطبيق نسبة القص
-            if (cropRatio !== 'free') {
-                const [rw, rh] = cropRatio.split(':').map(Number);
-                const aspect = rw / rh;
-                let cw = Math.abs(cropEnd.x - cropStart.x);
-                let ch = cw / aspect;
-                cropEnd.x = cropStart.x + cw * Math.sign(cropEnd.x - cropStart.x || 1);
-                cropEnd.y = cropStart.y + ch * Math.sign(cropEnd.y - cropStart.y || 1);
-            }
-
-            renderImage();
-        }
-
-        function endCrop() {
-            // نحتفظ بالمستطيل
-        }
-
-        // تفعيل القص لما يفتح لوحة القص
-        const cropObserver = new MutationObserver(() => {
-            const panel = document.getElementById('panelCrop');
+    function onEnd(e) {
+        const touch = e.changedTouches ? e.changedTouches[0] : e;
+        const dy = touch.clientY - startY;
+        panel.style.transition = '';
+        panel.style.transform = '';
+        if (dy > 80) {
+            closeAllPanels();
+        } else {
             if (panel.classList.contains('open')) {
-                isCropping = true;
-                canvas.style.cursor = 'crosshair';
-            } else {
-                isCropping = false;
-                cropStart = null;
-                cropEnd = null;
-                canvas.style.cursor = 'default';
+                panel.style.transform = '';
             }
-        });
-        cropObserver.observe(document.getElementById('panelCrop'), { attributes: true, attributeFilter: ['class'] });
-
-        document.getElementById('cropApply').addEventListener('click', () => {
-            if (!cropStart || !cropEnd || !originalImage) {
-                showToast('اسحب على الصورة لتحديد منطقة القص');
-                return;
-            }
-            saveState();
-
-            const x = Math.min(cropStart.x, cropEnd.x);
-            const y = Math.min(cropStart.y, cropEnd.y);
-            const cw = Math.abs(cropEnd.x - cropStart.x);
-            const ch = Math.abs(cropEnd.y - cropStart.y);
-
-            if (cw < 10 || ch < 10) {
-                showToast('المنطقة صغيرة جدا');
-                return;
-            }
-
-            // قص الصورة
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = cw;
-            tempCanvas.height = ch;
-            const tctx = tempCanvas.getContext('2d');
-            tctx.drawImage(canvas, x, y, cw, ch, 0, 0, cw, ch);
-
-            const newImg = new Image();
-            newImg.onload = function() {
-                originalImage = newImg;
-                freeRotation = 0;
-                document.getElementById('rotSlider').value = 0;
-                updateRotFill();
-                isCropping = false;
-                cropStart = null;
-                cropEnd = null;
-                canvas.style.cursor = 'default';
-                closeAllPanels();
-                renderImage();
-                showToast('تم القص بنجاح');
-            };
-            newImg.src = tempCanvas.toDataURL();
-        });
-
-        document.getElementById('cropCancelBtn').addEventListener('click', () => {
-            isCropping = false;
-            cropStart = null;
-            cropEnd = null;
-            canvas.style.cursor = 'default';
-            renderImage();
-        });
-
-        // ===== مقارنة قبل/بعد =====
-        let compareTimer = null;
-        document.getElementById('imageArea').addEventListener('mousedown', (e) => {
-            if (isCropping) return;
-            if (!originalImage) return;
-            // تأكد إنك مش على لوحة
-            if (e.target.closest('.tool-panel')) return;
-            isComparing = true;
-            document.getElementById('compareHint').classList.add('show');
-            renderImage(true);
-        });
-
-        document.getElementById('imageArea').addEventListener('mouseup', () => {
-            if (!isComparing) return;
-            isComparing = false;
-            document.getElementById('compareHint').classList.remove('show');
-            renderImage(false);
-        });
-
-        document.getElementById('imageArea').addEventListener('touchstart', (e) => {
-            if (isCropping) return;
-            if (!originalImage) return;
-            if (e.target.closest('.tool-panel')) return;
-            isComparing = true;
-            document.getElementById('compareHint').classList.add('show');
-            renderImage(true);
-        }, { passive: true });
-
-        document.getElementById('imageArea').addEventListener('touchend', () => {
-            if (!isComparing) return;
-            isComparing = false;
-            document.getElementById('compareHint').classList.remove('show');
-            renderImage(false);
-        });
-
-        // ===== إلغاء =====
-        document.getElementById('btnCancel').addEventListener('click', () => {
-            if (historyStack.length > 1) {
-                const first = historyStack[0];
-                currentFilter = first.filter;
-                adjustments = { ...first.adj };
-                flipH = first.flipH;
-                flipV = first.flipV;
-                freeRotation = first.freeRotation;
-                document.getElementById('rotSlider').value = freeRotation;
-                updateRotFill();
-                renderImage();
-                showToast('تم إلغاء كل التعديلات');
-            } else {
-                // رجوع لشاشة الرفع
-                originalImage = null;
-                document.getElementById('uploadScreen').classList.remove('hidden');
-                document.getElementById('topBar').classList.remove('visible');
-                document.getElementById('bottomBar').classList.remove('visible');
-                closeAllPanels();
-                historyStack = [];
-            }
-        });
-
-        // ===== تم (حفظ/تحميل) =====
-        document.getElementById('btnDone').addEventListener('click', () => {
-            if (!originalImage) return;
-            const link = document.createElement('a');
-            link.download = 'photo-edited.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            showToast('تم حفظ الصورة');
-        });
-
-        // ===== إعادة تعيين الكل =====
-        function resetAll(render = true) {
-            currentFilter = 'none';
-            adjustments = {
-                exposure: 0, brilliance: 0, highlights: 0, shadows: 0,
-                contrast: 0, brightness: 0, blackpoint: 0, saturation: 0,
-                vibrance: 0, warmth: 0, tint: 0, sharpness: 0,
-                definition: 0, noise: 0, vignette: 0
-            };
-            flipH = false;
-            flipV = false;
-            freeRotation = 0;
-            cropStart = null;
-            cropEnd = null;
-            isCropping = false;
-            document.getElementById('rotSlider').value = 0;
-            updateRotFill();
-            document.getElementById('sliderContainer').innerHTML = '';
-            activeTool = null;
-            if (render && originalImage) renderImage();
-            historyStack = [];
         }
+    }
 
-        // ===== اختصارات =====
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'z') {
-                e.preventDefault();
-                if (historyStack.length > 1) {
-                    historyStack.pop();
-                    const prev = historyStack[historyStack.length - 1];
-                    currentFilter = prev.filter;
-                    adjustments = { ...prev.adj };
-                    flipH = prev.flipH;
-                    flipV = prev.flipV;
-                    freeRotation = prev.freeRotation;
-                    document.getElementById('rotSlider').value = freeRotation;
-                    updateRotFill();
-                    renderImage();
-                    showToast('تم التراجع');
-                }
-            }
-        });
+    handle.addEventListener('touchstart', onStart, {passive:true});
+    handle.addEventListener('touchmove', onMove, {passive:true});
+    handle.addEventListener('touchend', onEnd);
+    handle.addEventListener('mousedown', onStart);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+});
+
+// ===== اختصارات لوحة المفاتيح =====
+document.addEventListener('keydown', (e) => {
+    if (!originalImage) return;
+    if (e.key === 'Escape') closeAllPanels();
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); /* could add undo */ }
+});
     </script>
 </body>
 </html>

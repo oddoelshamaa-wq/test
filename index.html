@@ -349,43 +349,88 @@
         }
 
         /* ===== أدوات التعديل - شكل آيفوني ===== */
-        .edit-options {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-            margin-bottom: 20px;
-        }
+  /* تصميم شريط الأدوات الأفقي */
+/* حاوية الأدوات - تمرير أفقي */
+.edit-options {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px; /* مسافة بين كل أداة وأخرى */
+    padding: 20px 15px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+    background: transparent;
+}
 
-        .edit-opt {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            padding: 12px 4px;
-            border-radius: 12px;
-            background: none;
-            border: none;
-            color: var(--ios-text);
-            font-family: inherit;
-            font-size: 10px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+.edit-options::-webkit-scrollbar {
+    display: none;
+}
 
-        .edit-opt:active {
-            background: var(--ios-card2);
-        }
+/* زر الأداة الواحد */
+.edit-opt {
+    flex: 0 0 75px; /* عرض ثابت لكل أداة لمنع تداخل الكلام */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+}
 
-        .edit-opt-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
+/* الدائرة السوداء للأيقونة */
+.edit-opt-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #151515; /* لون خلفية الأيقونة داكن جداً */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #252525; /* إطار خفيف */
+}
 
+/* الحلقة الصفراء (تظهر عند التعديل أو الاختيار) */
+.edit-opt.active .edit-opt-icon {
+    border-color: #ffd60a; /* اللون الأصفر لآيفون */
+    background: #000;
+}
+
+/* إضافة حلقة داخلية عند وجود قيمة تعديل */
+.edit-opt.modified .edit-opt-icon::after {
+    content: '';
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    border: 2px solid #ffd60a;
+    border-radius: 50%;
+}
+
+/* تنسيق النص (الكلمات) */
+.edit-opt span {
+    font-size: 12px;
+    color: #8e8e93; /* لون رمادي للنصوص غير النشطة */
+    font-weight: 500;
+    white-space: nowrap; /* منع انقسام الكلمة لسطرين */
+    transition: color 0.2s;
+}
+
+.edit-opt.active span {
+    color: #ffffff; /* اللون الأبيض للكلمة المختارة */
+    font-weight: 600;
+}
+
+/* أيقونات SVG داخل الدوائر */
+.edit-opt-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 1.5;
+}
         .edit-opt-icon.auto { background: rgba(255, 159, 10, 0.2); color: var(--ios-orange); }
         .edit-opt-icon.exposure { background: rgba(10, 132, 255, 0.2); color: var(--ios-blue); }
         .edit-opt-icon.brilliance { background: rgba(100, 210, 255, 0.2); color: var(--ios-teal); }
@@ -1157,33 +1202,91 @@
         }
 
         // ===== أدوات التعديل =====
-        function buildEditOptions() {
-            const container = document.getElementById('editOptions');
-            container.innerHTML = '';
-            editTools.forEach(tool => {
-                const btn = document.createElement('button');
-                btn.className = 'edit-opt';
-                btn.dataset.tool = tool.id;
-                btn.innerHTML = `
-                    <div class="edit-opt-icon ${tool.icon}">
-                        <i class="fas fa-${tool.icon === 'auto' ? 'magic' : tool.icon === 'exposure' ? 'sun' : tool.icon === 'brilliance' ? 'bolt' : tool.icon === 'highlights' ? 'cloud-sun' : tool.icon === 'shadows' ? 'moon' : tool.icon === 'contrast' ? 'adjust' : tool.icon === 'brightness' ? 'lightbulb' : tool.icon === 'blackpoint' ? 'circle' : tool.icon === 'saturation' ? 'palette' : tool.icon === 'vibrance' ? 'fire' : tool.icon === 'warmth' ? 'temperature-high' : tool.icon === 'tint' ? 'tint' : tool.icon === 'sharpness' ? 'crosshairs' : tool.icon === 'definition' ? 'eye' : tool.icon === 'noise' ? '-water' : tool.icon === 'vignette' ? 'compress-alt' : 'sliders-h'}"></i>
-                    </div>
-                    <span>${tool.label}</span>
-                `;
-                btn.addEventListener('click', () => {
-                    if (tool.id === 'auto') {
-                        saveState();
-                        applyAutoEnhance();
-                        return;
-                    }
-                    activeTool = tool.id;
-                    showSlider(tool);
-                    document.querySelectorAll('.edit-opt').forEach(e => e.style.background = '');
-                    btn.style.background = 'var(--ios-card2)';
-                });
-                container.appendChild(btn);
-            });
-        }
+   function buildEditOptions() {
+    const container = document.getElementById('editOptions');
+    container.innerHTML = '';
+    
+    editTools.forEach(tool => {
+        const btn = document.createElement('button');
+        btn.className = 'edit-opt';
+        btn.id = `opt-${tool.id}`;
+        
+        // الأيقونة (استبدلت بـ SVG مبسط ليشبه الآيفون)
+        btn.innerHTML = `
+            <div class="edit-opt-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                    ${getIconPath(tool.id)}
+                </svg>
+            </div>
+            <span>${tool.label}</span>
+        `;
+        
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.edit-opt').forEach(e => e.classList.remove('active'));
+            btn.classList.add('active');
+            activeTool = tool.id;
+            showDialSlider(tool);
+        });
+        container.appendChild(btn);
+    });
+
+    // تفعيل أول أداة تلقائياً
+    if(editTools.length > 0) document.querySelector('.edit-opt').click();
+}
+
+// وظيفة لعرض منزلق "البكرة"
+function showDialSlider(tool) {
+    const container = document.getElementById('sliderContainer');
+    const currentVal = adjustments[tool.id] || 0;
+
+    container.innerHTML = `
+        <div class="dial-container">
+            <div class="dial-cursor"></div>
+            <div class="dial-ticks" id="dialTicks"></div>
+            <input type="range" class="ios-range-dial" id="dialInput" 
+                   min="${tool.min || -100}" max="${tool.max || 100}" value="${currentVal}">
+        </div>
+        <div style="text-align:center; color:var(--ios-yellow); font-weight:bold; margin-top:-10px;">
+            ${currentVal !== 0 ? currentVal : ''}
+        </div>
+    `;
+
+    const ticksSub = document.getElementById('dialTicks');
+    // إنشاء 50 شرطة للبكرة
+    for(let i=0; i<60; i++) {
+        const tick = document.createElement('div');
+        tick.className = i % 5 === 0 ? 'tick major' : 'tick';
+        ticksSub.appendChild(tick);
+    }
+
+    const input = document.getElementById('dialInput');
+    input.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        adjustments[tool.id] = val;
+        
+        // تحريك البكرة بصرياً
+        const offset = val * 0.5; // نسبة التحريك
+        ticksSub.style.transform = `translateX(${-offset}px)`;
+        
+        renderImage();
+        // تحديث الرقم الظاهر
+        e.target.parentElement.nextElementSibling.textContent = val !== 0 ? val : '';
+    });
+    
+    input.addEventListener('change', () => saveState());
+}
+
+// أيقونات مبسطة تشبه iOS
+function getIconPath(id) {
+    const icons = {
+        auto: '<path d="M12 2L9 9l-7 3 7 3 3 7 3-7 7-3-7-3-3-7z"/>',
+        exposure: '<circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/>',
+        brightness: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
+        contrast: '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2v20z"/>',
+        saturation: '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2s-10 4.477-10 10 4.477 10 10 10z"/><path d="M12 18a6 6 0 100-12 6 6 0 000 12z"/>',
+    };
+    return icons[id] || '<circle cx="12" cy="12" r="10"/>';
+}
         buildEditOptions();
 
         // ===== عرض السلايدر =====
